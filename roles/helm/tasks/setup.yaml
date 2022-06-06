@@ -1,0 +1,30 @@
+---
+- name: Install GNU tar on Alpine
+  ansible.builtin.apk:
+    name: tar
+    state: present
+  when: ansible_distribution == 'Alpine'
+
+- name: Download Helm binary
+  ansible.builtin.unarchive:
+    src: https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz
+    remote_src: yes
+    dest: ~/
+    include:
+      - linux-amd64/helm
+
+- name: Install Helm binary
+  ansible.builtin.copy:
+    remote_src: yes
+    src: ~/linux-amd64/helm
+    dest: /usr/local/bin
+    mode: "755"
+
+- name: Remove extracted Helm folder
+  ansible.builtin.file:
+    path: ~/linux-amd64
+    state: absent
+
+- name: Set helm_present fact to yes
+  ansible.builtin.set_fact:
+    helm_present: yes

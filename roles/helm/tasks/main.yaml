@@ -1,0 +1,13 @@
+---
+- name: Get Helm version
+  ansible.builtin.command: '/usr/local/bin/helm version'
+  ignore_errors: true
+  register: helm
+
+- name: Set helm_present fact
+  ansible.builtin.set_fact:
+    helm_present: "{{ not helm.failed and helm.stdout | regex_search(helm_version | regex_escape()) }}"
+
+- name: Include Helm installation
+  ansible.builtin.include_tasks: setup.yaml
+  when: not helm_present

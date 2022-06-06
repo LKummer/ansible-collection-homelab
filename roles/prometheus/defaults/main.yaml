@@ -1,0 +1,6 @@
+---
+  kube_prometheus_stack_version: '34.2.0'
+  loki_stack_version: '2.6.1'
+  grafana_host: grafana.example.com
+  grafana_user: admin
+  grafana_password: admin

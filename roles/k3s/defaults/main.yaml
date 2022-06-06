@@ -1,0 +1,3 @@
+---
+  # For latest stable release, see https://update.k3s.io/v1-release/channels
+  k3s_version: 'v1.22.7+k3s1'

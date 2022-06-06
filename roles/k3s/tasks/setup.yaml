@@ -1,0 +1,36 @@
+---
+- name: Set update-extlinux.conf
+  ansible.builtin.replace:
+    path: /etc/update-extlinux.conf
+    after: 'default_kernel_opts='
+    regexp: '"(?:cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory )?([\s\w=]*)"'
+    replace: '"cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory \1"'
+  register: extlinux
+
+- name: Run update-extlinux
+  ansible.builtin.command: update-extlinux
+  when: extlinux.changed
+
+- name: Reboot after update-extlinux
+  ansible.builtin.reboot:
+  when: extlinux.changed
+
+- name: Install curl
+  ansible.builtin.apk:
+    name: curl
+    state: present
+
+- name: Get K3s installation script
+  ansible.builtin.get_url:
+    url: https://get.k3s.io
+    dest: /tmp/get-k3s
+
+- name: Install K3s
+  ansible.builtin.shell: INSTALL_K3S_VERSION='{{ k3s_version }}' sh /tmp/get-k3s
+
+- name: Reboot after K3s installation
+  ansible.builtin.reboot:
+
+- name: Wait before grabbing config
+  ansible.builtin.wait_for:
+    timeout: 10
