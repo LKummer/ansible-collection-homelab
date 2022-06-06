@@ -6,6 +6,11 @@
   when: ansible_distribution == 'Alpine'
   become: true
 
+- name: Temporary download folder is present
+  ansible.builtin.file:
+    path: /tmp/helm
+    state: directory
+
 - name: Download Helm binary
   ansible.builtin.unarchive:
     src: https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz
