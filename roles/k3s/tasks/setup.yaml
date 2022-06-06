@@ -6,19 +6,23 @@
     regexp: '"(?:cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory )?([\s\w=]*)"'
     replace: '"cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory \1"'
   register: extlinux
+  become: true
 
 - name: Run update-extlinux
   ansible.builtin.command: update-extlinux
   when: extlinux.changed
+  become: true
 
 - name: Reboot after update-extlinux
   ansible.builtin.reboot:
   when: extlinux.changed
+  become: true
 
 - name: Install curl
   ansible.builtin.apk:
     name: curl
     state: present
+  become: true
 
 - name: Get K3s installation script
   ansible.builtin.get_url:
@@ -26,10 +30,12 @@
     dest: /tmp/get-k3s
 
 - name: Install K3s
-  ansible.builtin.shell: INSTALL_K3S_VERSION='{{ k3s_version }}' sh /tmp/get-k3s
+  ansible.builtin.shell: "INSTALL_K3S_VERSION='{{ k3s_version }}' sh /tmp/get-k3s"
+  become: true
 
 - name: Reboot after K3s installation
   ansible.builtin.reboot:
+  become: true
 
 - name: Wait before grabbing config
   ansible.builtin.wait_for:

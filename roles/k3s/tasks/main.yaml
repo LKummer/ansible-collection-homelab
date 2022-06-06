@@ -3,6 +3,7 @@
   ansible.builtin.command: '/usr/local/bin/k3s --version'
   ignore_errors: true
   register: k3s
+  become: true
 
 - name: Include K3s setup
   ansible.builtin.include_tasks: setup.yaml
@@ -12,6 +13,7 @@
   ansible.builtin.slurp:
     src: /etc/rancher/k3s/k3s.yaml
   register: k3s_config_base64
+  become: true
 
 - name: Decode K3s config
   ansible.builtin.set_fact:
