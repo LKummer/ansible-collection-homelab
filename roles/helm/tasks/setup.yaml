@@ -4,6 +4,7 @@
     name: tar
     state: present
   when: ansible_distribution == 'Alpine'
+  become: true
 
 - name: Download Helm binary
   ansible.builtin.unarchive:
@@ -19,6 +20,7 @@
     src: ~/linux-amd64/helm
     dest: /usr/local/bin
     mode: "755"
+  become: true
 
 - name: Remove extracted Helm folder
   ansible.builtin.file:
