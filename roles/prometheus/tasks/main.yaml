@@ -1,12 +1,13 @@
 ---
 - name: Add Grafana Helm repository
-  community.kubernetes.helm_repository:
+  kubernetes.core.helm_repository:
     name: grafana
     repo_url: https://grafana.github.io/helm-charts
     binary_path: /usr/local/bin/helm
 
 - name: Deploy Loki stack Helm chart
-  community.kubernetes.helm:
+  become: true
+  kubernetes.core.helm:
     name: loki
     chart_ref: grafana/loki-stack
     chart_version: '{{ loki_stack_version }}'
@@ -21,7 +22,7 @@
           enabled: true
 
 - name: Add Prometheus community Helm repository
-  community.kubernetes.helm_repository:
+  kubernetes.core.helm_repository:
     name: prometheus-community
     repo_url: https://prometheus-community.github.io/helm-charts
     binary_path: /usr/local/bin/helm
@@ -34,7 +35,8 @@
   # $ kubectl delete mutatingwebhookconfiguration/prometheus-kube-prometheus-admission
   # See https://github.com/prometheus-community/helm-charts/issues/108#issuecomment-703266597
 - name: Deploy Prometheus Operator Helm chart
-  community.kubernetes.helm:
+  become: true
+  kubernetes.core.helm:
     name: prometheus
     chart_ref: prometheus-community/kube-prometheus-stack
     chart_version: '{{ kube_prometheus_stack_version }}'
@@ -87,6 +89,6 @@
   register: prometheus_operator
 
 - name: Wait for Prometheus Operator CRDs
-  wait_for:
+  ansible.builtin.wait_for:
     timeout: 30
   when: prometheus_operator.changed
