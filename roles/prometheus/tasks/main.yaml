@@ -43,11 +43,11 @@
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
     values:
-      # Disable Etcd monitor because we are using K3s.
+      # Disabled because we are using K3s without etcd.
       kubeEtcd:
         enabled: false
 
-      # Disable to avoid crashing node exporter on K3s.
+      # Disabled to avoid crashing node exporter on K3s.
       nodeExporter:
         enabled: false
       
