@@ -1,0 +1,25 @@
+---
+argument_specs:
+  main:
+    short_description: Configures Prometheus Operator, Grafana, Loki and Promtail.
+    options:
+      prometheus_kube_prometheus_stack_version:
+        type: str
+        default: '35.5.1'
+        description: Version of prometheus-community/kube-prometheus-stack Helm chart deployed.
+      prometheus_loki_stack_version:
+        type: str
+        default: '2.6.4'
+        description: Version of grafana/loki-stack Helm chart deployed.
+      prometheus_grafana_host:
+        type: str
+        required: true
+        description: Hostname of the Grafana instance.
+      prometheus_grafana_user:
+        type: str
+        required: true
+        description: Username of the default Grafana administrator.
+      prometheus_grafana_password:
+        type: str
+        required: true
+        description: Password of the default Grafana administrator.
