@@ -2,6 +2,17 @@
 
 Collection with roles and plugins for automating a virtualized homelab.
 
+Roles:
+
+* `argo` configuring ArgoCD.
+* `helm` installing Helm.
+* `k3s` configuring K3s.
+* `prometheus` configuring Prometheus Operator, Grafana, Loki and Promtail.
+
+Inventory plugins:
+
+* `terraform_local` populating inventory from local Terraform state files.
+
 ## Installation
 
 Add the collection to your requirements file.
