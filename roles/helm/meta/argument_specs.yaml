@@ -1,0 +1,9 @@
+---
+argument_specs:
+  main:
+    short_description: Installs Helm.
+    options:
+      helm_version:
+        type: str
+        default: '3.9.0'
+        description: Helm version present.
