@@ -1,0 +1,25 @@
+---
+argument_specs:
+  main:
+    short_description: Configures ArgoCD.
+    options:
+      argo_host:
+        type: str
+        required: true
+        description: Hostname used for Ingress.
+      argo_monitoring_enabled:
+        type: bool
+        default: true
+        description: Configure Prometheus Operator custom resources for monitoring.
+      argo_cert_manager_enabled:
+        type: bool
+        default: true
+        description: Configure TLS certificates with Cert Manager.
+      argo_cert_manager_issuer_kind:
+        type: str
+        default: ClusterIssuer
+        description: Issuer kind used to issue Certificates.
+      argo_cert_manager_issuer_name:
+        type: str
+        default: letsencrypt
+        description: Issuer name used to issue Certificates.

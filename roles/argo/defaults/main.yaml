@@ -1,0 +1,5 @@
+---
+argo_monitoring_enabled: true
+argo_cert_manager_enabled: true
+argo_cert_manager_issuer_kind: ClusterIssuer
+argo_cert_manager_issuer_name: letsencrypt
