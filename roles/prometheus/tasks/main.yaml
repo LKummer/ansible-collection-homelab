@@ -57,6 +57,9 @@
       
       prometheus:
         prometheusSpec:
+          serviceMonitorSelector: '{{ prometheus_service_monitor_selector }}'
+          podMonitorSelector: '{{ prometheus_pod_monitor_selector }}'
+
           storageSpec:
             volumeClaimTemplate:
               spec:
@@ -68,8 +71,8 @@
                   - ReadWriteOnce
 
       grafana:
-        adminUser: "{{ prometheus_grafana_user }}"
-        adminPassword: "{{ prometheus_grafana_password }}"
+        adminUser: '{{ prometheus_grafana_user }}'
+        adminPassword: '{{ prometheus_grafana_password }}'
 
         persistence:
           enabled: true

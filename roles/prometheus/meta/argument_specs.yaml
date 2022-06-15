@@ -23,3 +23,11 @@ argument_specs:
         type: str
         required: true
         description: Password of the default Grafana administrator.
+      prometheus_service_monitor_selector:
+        type: dict
+        default: {}
+        description: Default service monitor selector for Prometheus.
+      prometheus_pod_monitor_selector:
+        type: dict
+        default: {}
+        description: Default pod monitor selector for Prometheus.
