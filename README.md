@@ -4,14 +4,15 @@ Collection with roles and plugins for automating a virtualized homelab.
 
 Roles:
 
-* `lkummer.homelab.argo` configuring ArgoCD.
-* `lkummer.homelab.helm` installing Helm.
-* `lkummer.homelab.k3s` configuring K3s.
-* `lkummer.homelab.prometheus` configuring Prometheus Operator, Grafana, Loki and Promtail.
+* `lkummer.homelab.argo` configures ArgoCD.
+* `lkummer.homelab.helm` installs Helm.
+* `lkummer.homelab.k3s` configures K3s.
+* `lkummer.homelab.prometheus` configures Prometheus Operator, Grafana, Loki and Promtail.
 
 Inventory plugins:
 
-* `lkummer.homelab.terraform_local` populating inventory from local Terraform state files.
+* `lkummer.homelab.terraform_local` populates inventory from local Terraform state files.
+* `lkummer.homelab.terraform_http` populates inventory from http Terraform state backend.
 
 ## Example
 
