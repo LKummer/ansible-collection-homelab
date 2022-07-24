@@ -4,7 +4,7 @@ from ansible.plugins.inventory import BaseInventoryPlugin
 from jinja2 import Template
 
 # See: https://github.com/ansible/ansible/blob/devel/examples/DOCUMENTATION.yml
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: lkummer.homelab.terraform_local
 short_description: Construct inventory from local Terraform state
 description:
@@ -46,13 +46,11 @@ options:
                 default: {}
 notes: []
 requirements: []
-'''
+"""
+
 
 class InventoryModule(BaseInventoryPlugin):
-    NAME = 'lkummer.homelab.terraform_local'
-
-    def verify_file(self, path):
-        return super(InventoryModule, self).verify_file(path)
+    NAME = "lkummer.homelab.terraform_local"
 
     # For more information on inventory, see:
     # https://github.com/ansible/ansible/blob/stable-2.13/lib/ansible/inventory/data.py
@@ -61,21 +59,24 @@ class InventoryModule(BaseInventoryPlugin):
         super().parse(inventory, loader, path, cache)
 
         config = self._read_config_data(path)
-        tfstate_path = Path(config['tfstate_path'])
-        with tfstate_path.open(mode='r') as tfstate_file:
+        tfstate_path = Path(config["tfstate_path"])
+        with tfstate_path.open(mode="r", encoding="utf-8") as tfstate_file:
             tfstate = load(tfstate_file)
             # Terraform outputs are stored as {value, type} dicts, this flattens to values.
-            template_context = {key: value['value'] for key, value in tfstate['outputs'].items()}
-            for host in config['hosts']:
-                ansible_host = Template(host['ansible_host']).render(template_context)
-                ansible_port = Template(host['ansible_port']).render(template_context)
-                ansible_group = Template(host['ansible_group']).render(template_context)
+            template_context = {
+                key: value["value"] for key, value in tfstate["outputs"].items()
+            }
+            for host in config["hosts"]:
+                ansible_host = Template(host["ansible_host"]).render(template_context)
+                ansible_port = Template(host["ansible_port"]).render(template_context)
+                ansible_group = Template(host["ansible_group"]).render(template_context)
 
-                # Add group before adding host, as adding host with unknown group will silently fail.
+                # Add group before adding host, as adding host with unknown group will
+                # silently fail.
                 inventory.add_group(ansible_group)
                 inventory.add_host(ansible_host, ansible_group, ansible_port)
 
                 # Add variables from vars key.
-                for key, value in host['vars'].items():
+                for key, value in host["vars"].items():
                     rendered_value = Template(value).render(template_context)
                     inventory.set_variable(ansible_host, key, rendered_value)
