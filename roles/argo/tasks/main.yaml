@@ -6,7 +6,7 @@
 
   - name: Download ArgoCD manifests
     ansible.builtin.get_url:
-      url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      url: https://raw.githubusercontent.com/argoproj/argo-cd/{{ argo_version }}/manifests/install.yaml
       dest: /tmp/argocd.yaml
 
   - name: Namespace for ArgoCD is present
