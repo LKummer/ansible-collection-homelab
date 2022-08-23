@@ -5,11 +5,11 @@ argument_specs:
     options:
       prometheus_kube_prometheus_stack_version:
         type: str
-        default: '35.5.1'
+        default: '39.9.0'
         description: Version of prometheus-community/kube-prometheus-stack Helm chart deployed.
       prometheus_loki_stack_version:
         type: str
-        default: '2.6.4'
+        default: '2.8.0'
         description: Version of grafana/loki-stack Helm chart deployed.
       prometheus_grafana_host:
         type: str

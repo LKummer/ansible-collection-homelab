@@ -5,5 +5,5 @@ argument_specs:
     options:
       k3s_version:
         type: str
-        default: v1.23.6+k3s1
+        default: v1.24.3+k3s1
         description: K3s release installed, see https://update.k3s.io/v1-release/channels.
