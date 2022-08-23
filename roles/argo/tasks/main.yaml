@@ -48,6 +48,10 @@
         kind: Certificate
         metadata:
           name: argocd-tls
+          labels:
+            app.kubernetes.io/name: argocd
+            app.kubernetes.io/component: argocd
+            app.kubernetes.io/managed-by: ansible
         spec:
           dnsNames:
             - '{{ argo_host }}'
@@ -71,6 +75,10 @@
         kind: IngressRoute
         metadata:
           name: argocd-server
+          labels:
+            app.kubernetes.io/name: argocd
+            app.kubernetes.io/component: argocd
+            app.kubernetes.io/managed-by: ansible
         spec:
           entryPoints:
             - websecure
@@ -103,6 +111,9 @@
           name: argocd-metrics
           labels:
             release: prometheus
+            app.kubernetes.io/name: argocd
+            app.kubernetes.io/component: argocd
+            app.kubernetes.io/managed-by: ansible
         spec:
           selector:
             matchLabels:
@@ -123,6 +134,9 @@
           name: argocd-server-metrics
           labels:
             release: prometheus
+            app.kubernetes.io/name: argocd
+            app.kubernetes.io/component: argocd
+            app.kubernetes.io/managed-by: ansible
         spec:
           selector:
             matchLabels:
@@ -143,6 +157,9 @@
           name: argocd-repo-server-metrics
           labels:
             release: prometheus
+            app.kubernetes.io/name: argocd
+            app.kubernetes.io/component: argocd
+            app.kubernetes.io/managed-by: ansible
         spec:
           selector:
             matchLabels:
