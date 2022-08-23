@@ -2,7 +2,7 @@
   - name: kubernetes.core requirements are present
     become: true
     ansible.builtin.pip:
-      name: kubernetes==23.3.0
+      name: kubernetes==24.2.0
 
   - name: Download ArgoCD manifests
     ansible.builtin.get_url:

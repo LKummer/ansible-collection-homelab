@@ -1,0 +1,29 @@
+---
+argument_specs:
+  main:
+    short_description: Configures Cert Manager to issue certificates with Let's Encrypt and Cloudflare DNS.
+    options:
+      cert_manager_chart_version:
+        type: str
+        default: v1.9.1
+        description: Version of Cert Manager to use.
+      cert_manager_production_server:
+        type: bool
+        default: false
+        description: Use Let's Encrypt's production server when on, staging server when off.
+      cert_manager_clusterissuer_name:
+        type: str
+        default: letsencrypt
+        description: Name of the configured ClusterIssuer.
+      cert_manager_cloudflare_email:
+        type: str
+        required: true
+        description: Cloudflare account email.
+      cert_manager_cloudflare_token:
+        type: str
+        required: true
+        description: Cloudflare account token with permissions for 'Zone - DNS - Edit' and 'Zone - Zone - Read'.
+      cert_manager_cloudflare_zone:
+        type: str
+        required: true
+        description: Domain (zone) to use.

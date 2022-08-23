@@ -5,6 +5,7 @@ Collection with roles and plugins for automating a virtualized homelab.
 Roles:
 
 * `lkummer.homelab.argo` configures ArgoCD.
+* `lkummer.homelab.cert_manager` configures Cert Manager and a ClusterIssuer using Let's Encrypt and Cloudflare DNS.
 * `lkummer.homelab.helm` installs Helm.
 * `lkummer.homelab.k3s` configures K3s.
 * `lkummer.homelab.prometheus` configures Prometheus Operator, Grafana, Loki and Promtail.
