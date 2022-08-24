@@ -12,3 +12,8 @@
 - name: Include Helm installation
   ansible.builtin.include_tasks: setup.yaml
   when: not helm_present
+
+- name: kubernetes.core.k8s module requirement is present
+  become: true
+  ansible.builtin.pip:
+    name: kubernetes==24.2.0

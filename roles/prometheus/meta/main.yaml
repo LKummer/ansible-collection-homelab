@@ -1,0 +1,4 @@
+---
+# Intentionally not using FQCN so the role works outside the collection.
+dependencies:
+  - role: helm

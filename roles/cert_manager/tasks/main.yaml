@@ -1,9 +1,4 @@
 ---
-  - name: kubernetes.core requirements are present
-    become: true
-    ansible.builtin.pip:
-      name: kubernetes==24.2.0
-
   - name: Add Jetstack Helm repository
     become: true
     kubernetes.core.helm_repository:
