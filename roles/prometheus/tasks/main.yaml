@@ -46,6 +46,7 @@
     binary_path: /usr/local/bin/helm
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
+    wait: true
     values:
       # Disabled because we are using K3s without etcd.
       kubeEtcd:
@@ -102,10 +103,3 @@
             - secretName: grafana-tls
               hosts:
                 - '{{ prometheus_grafana_host }}'
-
-  register: prometheus_operator
-
-- name: Wait for Prometheus Operator CRDs
-  ansible.builtin.wait_for:
-    timeout: 30
-  when: prometheus_operator.changed

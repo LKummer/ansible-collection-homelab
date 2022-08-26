@@ -17,14 +17,9 @@
     release_namespace: cert-manager
     create_namespace: true
     update_repo_cache: true
+    wait: true
     values:
       installCRDs: true
-  register: cert_manager
-
-- name: Wait for cert-manager CRDs
-  ansible.builtin.wait_for:
-    timeout: 30
-  when: cert_manager.changed
 
 - name: Secret with Cloudflare token is present
   become: true
