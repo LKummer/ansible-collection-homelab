@@ -82,6 +82,10 @@
                 type: prometheus
                 url: http://prometheus-kube-prometheus-prometheus.prometheus:9090
 
+        grafana.ini:
+          analytics:
+            reporting_enabled: false
+
         persistence:
           enabled: true
 
