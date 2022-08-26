@@ -40,3 +40,7 @@
 - name: Wait before grabbing config
   ansible.builtin.wait_for:
     timeout: 10
+
+- name: Set k3s_present fact
+  ansible.builtin.set_fact:
+    k3s_present: true

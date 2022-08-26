@@ -4,6 +4,8 @@
   ignore_errors: true
   changed_when: false
   register: helm
+  # Run normally even in check mode.
+  check_mode: false
 
 - name: Set helm_present fact
   ansible.builtin.set_fact:
@@ -14,7 +16,13 @@
 
 - name: Include Helm installation
   ansible.builtin.include_tasks: setup.yaml
-  when: not helm_present
+  when: (not helm_present) and (not ansible_check_mode)
+
+# Use assert to verify Helm is present when running in check mode.
+- name: Assert Helm is present
+  ansible.builtin.assert:
+    that:
+      - helm_present
 
 - name: Git is present for Helm plugin installation
   become: true
