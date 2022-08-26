@@ -6,7 +6,7 @@ Roles:
 
 * `lkummer.homelab.argo` configures ArgoCD.
 * `lkummer.homelab.cert_manager` configures Cert Manager and a ClusterIssuer using Let's Encrypt and Cloudflare DNS.
-* `lkummer.homelab.helm` installs Helm.
+* `lkummer.homelab.helm` configures hosts for use with `kubernetes.core.helm` and `kubernetes.core.k8s` modules.
 * `lkummer.homelab.k3s` configures K3s.
 * `lkummer.homelab.prometheus` configures Prometheus Operator, Grafana, Loki and Promtail.
 
