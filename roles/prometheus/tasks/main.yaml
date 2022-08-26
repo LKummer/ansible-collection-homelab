@@ -74,6 +74,14 @@
         adminUser: '{{ prometheus_grafana_user }}'
         adminPassword: '{{ prometheus_grafana_password }}'
 
+        datasources:
+          datasources.yaml:
+            apiVersion: 1
+            datasources:
+              - name: Prometheus
+                type: prometheus
+                url: http://prometheus-kube-prometheus-prometheus.prometheus:9090
+
         persistence:
           enabled: true
 
