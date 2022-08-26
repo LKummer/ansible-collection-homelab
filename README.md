@@ -25,7 +25,6 @@ Included roles are designed to work together to configure a single host Kubernet
   hosts: production
   roles:
     - role: lkummer.homelab.k3s
-    - role: lkummer.homelab.helm
     - role: lkummer.homelab.prometheus
       vars:
         prometheus_grafana_host: grafana.example.com
@@ -74,4 +73,33 @@ For inventory plugin documentation, see:
 
 ```
 ansible-doc --type inventory lkummer.homelab.terraform_local
+```
+
+## Development
+
+Install Poetry as it is required to download development dependencies:
+
+```
+pip install poetry
+```
+
+Install the dependencies:
+
+```
+poetry install
+```
+
+Once installation finishes, use `poetry shell` to open a shell where you can run linters:
+
+```
+poetry shell
+```
+
+### Linting
+
+Make sure to lint with both yamllint and ansible-lint before pushing.
+
+```
+yamllint .
+ansible-lint -P production
 ```
