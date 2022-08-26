@@ -1,5 +1,5 @@
 ---
-  prometheus_kube_prometheus_stack_version: '39.9.0'
-  prometheus_loki_stack_version: '2.8.0'
-  prometheus_service_monitor_selector: {}
-  prometheus_pod_monitor_selector: {}
+prometheus_kube_prometheus_stack_version: 39.9.0
+prometheus_loki_stack_version: 2.8.0
+prometheus_service_monitor_selector: {}
+prometheus_pod_monitor_selector: {}

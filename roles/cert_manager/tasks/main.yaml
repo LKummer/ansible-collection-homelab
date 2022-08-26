@@ -1,76 +1,79 @@
 ---
-  - name: Add Jetstack Helm repository
-    become: true
-    kubernetes.core.helm_repository:
-      binary_path: /usr/local/bin/helm
-      name: jetstack
-      repo_url: https://charts.jetstack.io
+- name: Add Jetstack Helm repository
+  become: true
+  kubernetes.core.helm_repository:
+    binary_path: /usr/local/bin/helm
+    name: jetstack
+    repo_url: https://charts.jetstack.io
 
-  - name: Deploy cert-manager chart
-    become: true
-    kubernetes.core.helm:
-      binary_path: /usr/local/bin/helm
-      kubeconfig: /etc/rancher/k3s/k3s.yaml
-      name: cert-manager
-      chart_ref: jetstack/cert-manager
-      chart_version: '{{ cert_manager_chart_version }}'
-      release_namespace: cert-manager
-      create_namespace: true
-      update_repo_cache: true
-      values:
-        installCRDs: true
-    register: cert_manager
+- name: Deploy cert-manager chart
+  become: true
+  kubernetes.core.helm:
+    binary_path: /usr/local/bin/helm
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    name: cert-manager
+    chart_ref: jetstack/cert-manager
+    chart_version: '{{ cert_manager_chart_version }}'
+    release_namespace: cert-manager
+    create_namespace: true
+    update_repo_cache: true
+    values:
+      installCRDs: true
+  register: cert_manager
 
-  - name: Wait for cert-manager CRDs
-    ansible.builtin.wait_for:
-      timeout: 30
-    when: cert_manager.changed
+- name: Wait for cert-manager CRDs
+  ansible.builtin.wait_for:
+    timeout: 30
+  when: cert_manager.changed
 
-  - name: Secret with Cloudflare token is present
-    become: true
-    kubernetes.core.k8s:
-      kubeconfig: /etc/rancher/k3s/k3s.yaml
-      namespace: cert-manager
-      definition:
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: dns-challenge-cloudflare-token
-          labels:
-            app.kubernetes.io/name: cert-manager-letsencrypt
-            app.kubernetes.io/component: cert-manager-letsencrypt
-            app.kubernetes.io/managed-by: ansible
-        type: Opaque
-        data:
-          cloudflare-token: '{{ cert_manager_cloudflare_token | b64encode }}'
+- name: Secret with Cloudflare token is present
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: cert-manager
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: dns-challenge-cloudflare-token
+        labels:
+          app.kubernetes.io/name: cert-manager-letsencrypt
+          app.kubernetes.io/component: cert-manager-letsencrypt
+          app.kubernetes.io/managed-by: ansible
+      type: Opaque
+      data:
+        cloudflare-token: '{{ cert_manager_cloudflare_token | b64encode }}'
 
-  - name: ClusterIssuer is present
-    become: true
-    kubernetes.core.k8s:
-      kubeconfig: /etc/rancher/k3s/k3s.yaml
-      namespace: cert-manager
-      definition:
-        apiVersion: cert-manager.io/v1
-        kind: ClusterIssuer
-        metadata:
-          name: '{{ cert_manager_clusterissuer_name }}'
-          labels:
-            app.kubernetes.io/name: cert-manager-letsencrypt
-            app.kubernetes.io/component: cert-manager-letsencrypt
-            app.kubernetes.io/managed-by: ansible
-        spec:
-          acme:
-            server: '{{ "https://acme-v02.api.letsencrypt.org/directory" if cert_manager_production_server else "https://acme-staging-v02.api.letsencrypt.org/directory" }}'
-            email: '{{ cert_manager_cloudflare_email }}'
-            privateKeySecretRef:
-              name: letsencrypt-acme
-            solvers:
-              - dns01:
-                  cloudflare:
-                    email: '{{ cert_manager_cloudflare_email }}'
-                    apiTokenSecretRef:
-                      name: dns-challenge-cloudflare-token
-                      key: cloudflare-token
-                selector:
-                  dnsZones:
-                    - '{{ cert_manager_cloudflare_zone }}'
+- name: ClusterIssuer is present
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: cert-manager
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: '{{ cert_manager_clusterissuer_name }}'
+        labels:
+          app.kubernetes.io/name: cert-manager-letsencrypt
+          app.kubernetes.io/component: cert-manager-letsencrypt
+          app.kubernetes.io/managed-by: ansible
+      spec:
+        acme:
+          server: >
+            {{ "https://acme-v02.api.letsencrypt.org/directory"
+            if cert_manager_production_server else
+            "https://acme-staging-v02.api.letsencrypt.org/directory" }}
+          email: '{{ cert_manager_cloudflare_email }}'
+          privateKeySecretRef:
+            name: letsencrypt-acme
+          solvers:
+            - dns01:
+                cloudflare:
+                  email: '{{ cert_manager_cloudflare_email }}'
+                  apiTokenSecretRef:
+                    name: dns-challenge-cloudflare-token
+                    key: cloudflare-token
+              selector:
+                dnsZones:
+                  - '{{ cert_manager_cloudflare_zone }}'

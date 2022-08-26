@@ -14,7 +14,8 @@ argument_specs:
       argo_monitoring_enabled:
         type: bool
         default: true
-        description: Configure Prometheus Operator custom resources for monitoring.
+        description: >
+          Configure Prometheus Operator custom resources for monitoring.
       argo_cert_manager_enabled:
         type: bool
         default: true

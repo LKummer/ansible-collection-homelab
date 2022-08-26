@@ -1,0 +1,15 @@
+---
+extends: default
+
+rules:
+  braces:
+    forbid: non-empty
+  empty-values: enable
+  # Would enable this but it would be so much work...
+  # key-ordering: enable
+  line-length:
+    max: 120
+  octal-values: enable
+  quoted-strings:
+    quote-type: single
+    required: only-when-needed
