@@ -4,7 +4,6 @@
   kubernetes.core.helm_repository:
     name: grafana
     repo_url: https://grafana.github.io/helm-charts
-    binary_path: /usr/local/bin/helm
 
 - name: Deploy Loki stack Helm chart
   become: true
@@ -14,7 +13,6 @@
     chart_version: '{{ prometheus_loki_stack_version }}'
     release_namespace: prometheus
     create_namespace: true
-    binary_path: /usr/local/bin/helm
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
     values:
@@ -27,7 +25,6 @@
   kubernetes.core.helm_repository:
     name: prometheus-community
     repo_url: https://prometheus-community.github.io/helm-charts
-    binary_path: /usr/local/bin/helm
 
 # IMPORTANT NOTE
 # Deleting the namespace this chart is in does not delete all resources, new
@@ -43,7 +40,6 @@
     chart_ref: prometheus-community/kube-prometheus-stack
     chart_version: '{{ prometheus_kube_prometheus_stack_version }}'
     release_namespace: prometheus
-    binary_path: /usr/local/bin/helm
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
     wait: true
