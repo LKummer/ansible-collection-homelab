@@ -1,2 +1,4 @@
 ---
-  helm_version: 'v3.9.0'
+  helm_version: v3.9.0
+  helm_diff_plugin_version: v3.5.0
+  helm_kubernetes_python_version: 24.2.0

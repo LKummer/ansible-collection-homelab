@@ -13,7 +13,20 @@
   ansible.builtin.include_tasks: setup.yaml
   when: not helm_present
 
+- name: Git is present for Helm plugin installation
+  become: true
+  ansible.builtin.apk:
+    name: git
+    state: present
+
+# Improves the idempotency check in kubernetes.core.helm.
+- name: Helm Diff plugin is present
+  become: true
+  kubernetes.core.helm_plugin:
+    plugin_path: https://github.com/databus23/helm-diff
+    plugin_version: '{{ helm_diff_plugin_version }}'
+
 - name: kubernetes.core.k8s module requirement is present
   become: true
   ansible.builtin.pip:
-    name: kubernetes==24.2.0
+    name: kubernetes=={{ helm_kubernetes_python_version }}
