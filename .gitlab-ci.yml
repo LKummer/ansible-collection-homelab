@@ -1,0 +1,12 @@
+---
+stages:
+  - lint
+
+lint:
+  stage: lint
+  image: python:3.10.6-slim-bullseye
+  script:
+    - pip install poetry
+    - poetry install
+    - poetry run ansible-lint -P production
+    - poetry run yamllint .

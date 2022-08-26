@@ -21,3 +21,4 @@ build_ignore:
   - poetry.lock
   - pyproject.toml
   - .yamllint.yaml
+  - .gitlab-ci.yml
