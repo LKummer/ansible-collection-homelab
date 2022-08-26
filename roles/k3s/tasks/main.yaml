@@ -28,6 +28,7 @@
   ansible.builtin.file:
     name: ./secrets
     state: directory
+    mode: '600'
   delegate_to: localhost
   become: false
 
@@ -35,5 +36,6 @@
   ansible.builtin.copy:
     dest: ./secrets/k3s.{{ ansible_default_ipv4.address }}.yaml
     content: '{{ k3s_config }}'
+    mode: '600'
   delegate_to: localhost
   become: false

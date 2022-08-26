@@ -9,6 +9,7 @@
   ansible.builtin.file:
     path: /tmp/helm
     state: directory
+    mode: '755'
 
 - name: Download Helm binary
   ansible.builtin.unarchive:

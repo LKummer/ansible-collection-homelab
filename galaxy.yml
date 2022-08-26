@@ -1,14 +1,11 @@
 ---
 namespace: lkummer
 name: homelab
+description: Lior's Kubernetes homelab collection
 version: 0.1.1
 readme: README.md
 authors:
   - Lior Kummer <lior@sneakybugs.com>
-
-# Optional
-# description: your collection description
-
 license:
   - GPL-3.0-or-later
 
@@ -23,3 +20,4 @@ issues: https://github.com/LKummer/ansible-collection-homelab/issues
 build_ignore:
   - poetry.lock
   - pyproject.toml
+  - .yamllint.yaml

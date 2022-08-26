@@ -3,6 +3,7 @@
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/argoproj/argo-cd/{{ argo_version }}/manifests/install.yaml
     dest: /tmp/argocd.yaml
+    mode: '644'
 
 - name: Namespace for ArgoCD is present
   become: true

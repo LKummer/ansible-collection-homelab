@@ -29,7 +29,7 @@
     plugin_path: https://github.com/databus23/helm-diff
     plugin_version: '{{ helm_diff_plugin_version }}'
 
-- name: kubernetes.core.k8s module requirement is present
+- name: Kubernetes.core.k8s module requirement is present
   become: true
   ansible.builtin.pip:
     name: kubernetes=={{ helm_kubernetes_python_version }}
