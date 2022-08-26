@@ -28,7 +28,7 @@
   ansible.builtin.file:
     name: ./secrets
     state: directory
-    mode: '600'
+    mode: '700'
   delegate_to: localhost
   become: false
 
