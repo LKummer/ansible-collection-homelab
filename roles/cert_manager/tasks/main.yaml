@@ -53,7 +53,7 @@
           app.kubernetes.io/managed-by: ansible
       spec:
         acme:
-          server: >
+          server: >-
             {{ "https://acme-v02.api.letsencrypt.org/directory"
             if cert_manager_production_server else
             "https://acme-staging-v02.api.letsencrypt.org/directory" }}
