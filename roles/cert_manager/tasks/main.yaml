@@ -18,6 +18,10 @@
     wait: true
     values:
       installCRDs: true
+      extraArgs:
+        # Avoid using private DNS because the TXT records for DNS01 challenges
+        # wont show up in a split horizon DNS setup.
+        - --dns01-recursive-nameservers=1.1.1.1:53
 
 - name: Secret with Cloudflare token is present
   become: true
