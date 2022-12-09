@@ -9,10 +9,7 @@
 
 - name: Set helm_present fact
   ansible.builtin.set_fact:
-    helm_present: >
-      {{ not helm.failed and helm.stdout
-      | regex_search(helm_version
-      | regex_escape()) }}
+    helm_present: '{{ not helm.failed and helm.stdout | regex_search(helm_version | regex_escape()) }}'
 
 - name: Include Helm installation
   ansible.builtin.include_tasks: setup.yaml
