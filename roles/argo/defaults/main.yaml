@@ -1,6 +1,5 @@
 ---
-argo_version: v2.4.11
-argo_monitoring_enabled: true
+argo_chart_version: 5.16.2
 argo_cert_manager_enabled: true
 argo_cert_manager_issuer_kind: ClusterIssuer
 argo_cert_manager_issuer_name: letsencrypt

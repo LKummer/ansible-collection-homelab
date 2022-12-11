@@ -1,44 +1,89 @@
 ---
-- name: Download ArgoCD manifests
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/argoproj/argo-cd/{{ argo_version }}/manifests/install.yaml
-    dest: /tmp/argocd.yaml
-    mode: '644'
-
-- name: Namespace for ArgoCD is present
+- name: Add ArgoCD Helm repository
   become: true
-  kubernetes.core.k8s:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    api_version: v1
-    kind: namespace
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: https://argoproj.github.io/argo-helm
+
+- name: ArgoCD is deployed
+  become: true
+  kubernetes.core.helm:
     name: argocd
-
-- name: Install ArgoCD
-  become: true
-  kubernetes.core.k8s:
+    chart_ref: argo/argo-cd
+    chart_version: '{{ argo_chart_version }}'
+    release_namespace: argo-cd
+    create_namespace: true
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    namespace: argocd
-    src: /tmp/argocd.yaml
+    update_repo_cache: true
+    values:
+      configs:
+        params:
+          # Disable TLS to terminate TLS in Traefik IngressRoute.
+          server.insecure: true
+      controller:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            namespace: argo-cd
+            selector:
+              release: prometheus
+      dex:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            namespace: argo-cd
+            selector:
+              release: prometheus
+      redis:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            namespace: argo-cd
+            selector:
+              release: prometheus
+      server:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            namespace: argo-cd
+            selector:
+              release: prometheus
+      repoServer:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            namespace: argo-cd
+            selector:
+              release: prometheus
+      applicationSet:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            namespace: argo-cd
+            selector:
+              release: prometheus
+      notifications:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            namespace: argo-cd
+            selector:
+              release: prometheus
 
-- name: ArgoCD Deployment is patched for terminating TLS in Traefik
-  become: true
-  kubernetes.core.k8s_json_patch:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    kind: Deployment
-    namespace: argocd
-    name: argocd-server
-    patch:
-      - op: replace
-        path: /spec/template/spec/containers/0/command
-        value:
-          - argocd-server
-          - --insecure
-
+# We need to define the Certificate resource for our IngressRoute because
+# Cert Manager does not support picking up annotations on Traefik IngressRoutes.
 - name: Certificate for ArgoCD Ingress is present
   become: true
   kubernetes.core.k8s:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    namespace: argocd
+    namespace: argo-cd
     definition:
       apiVersion: cert-manager.io/v1
       kind: Certificate
@@ -60,12 +105,14 @@
           - key encipherment
   when: argo_cert_manager_enabled
 
-
+# Since routing GRPC is required, normal Ingress won't cut it.
+# The chart only contains definitions for Nginx Ingress Controller, since we
+# use Traefik we have to define an IngressRoute.
 - name: Ingress for ArgoCD is present
   become: true
   kubernetes.core.k8s:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    namespace: argocd
+    namespace: argo-cd
     definition:
       apiVersion: traefik.containo.us/v1alpha1
       kind: IngressRoute
@@ -94,72 +141,3 @@
                 scheme: h2c
         tls:
           secretName: argocd-cert
-
-- name: ArgoCD metrics ServiceMonitor is present
-  become: true
-  kubernetes.core.k8s:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    namespace: argocd
-    definition:
-      apiVersion: monitoring.coreos.com/v1
-      kind: ServiceMonitor
-      metadata:
-        name: argocd-metrics
-        labels:
-          release: prometheus
-          app.kubernetes.io/name: argocd
-          app.kubernetes.io/component: argocd
-          app.kubernetes.io/managed-by: ansible
-      spec:
-        selector:
-          matchLabels:
-            app.kubernetes.io/name: argocd-metrics
-        endpoints:
-          - port: metrics
-  when: argo_monitoring_enabled
-
-- name: ArgoCD server metrics ServiceMonitor is present
-  become: true
-  kubernetes.core.k8s:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    namespace: argocd
-    definition:
-      apiVersion: monitoring.coreos.com/v1
-      kind: ServiceMonitor
-      metadata:
-        name: argocd-server-metrics
-        labels:
-          release: prometheus
-          app.kubernetes.io/name: argocd
-          app.kubernetes.io/component: argocd
-          app.kubernetes.io/managed-by: ansible
-      spec:
-        selector:
-          matchLabels:
-            app.kubernetes.io/name: argocd-server-metrics
-        endpoints:
-          - port: metrics
-  when: argo_monitoring_enabled
-
-- name: ArgoCD repo metrics ServiceMonitor is present
-  become: true
-  kubernetes.core.k8s:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    namespace: argocd
-    definition:
-      apiVersion: monitoring.coreos.com/v1
-      kind: ServiceMonitor
-      metadata:
-        name: argocd-repo-server-metrics
-        labels:
-          release: prometheus
-          app.kubernetes.io/name: argocd
-          app.kubernetes.io/component: argocd
-          app.kubernetes.io/managed-by: ansible
-      spec:
-        selector:
-          matchLabels:
-            app.kubernetes.io/name: argocd-repo-server
-        endpoints:
-          - port: metrics
-  when: argo_monitoring_enabled
