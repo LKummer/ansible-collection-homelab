@@ -15,6 +15,7 @@
     create_namespace: true
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
+    wait: true
     values:
       configs:
         params:
