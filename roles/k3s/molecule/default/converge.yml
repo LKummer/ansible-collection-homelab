@@ -1,0 +1,11 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include homelab.k3s
+      ansible.builtin.include_role:
+        name: k3s
+
+    - name: Wait to let pods start up
+      ansible.builtin.wait_for:
+        timeout: 30

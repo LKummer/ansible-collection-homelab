@@ -8,5 +8,6 @@ lint:
   script:
     - pip install poetry
     - poetry install
+    - poetry run ansible-galaxy install -r requirements.yml
     - poetry run ansible-lint -P production
     - poetry run yamllint .

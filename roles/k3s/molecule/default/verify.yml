@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Get all Kubernetes pods
+      become: true
+      kubernetes.core.k8s_info:
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        kind: Pod
+      register: pod_list
+
+    - name: All pods are running or completed
+      ansible.builtin.assert:
+        that: item.status.phase == "Running" or item.status.phase == "Succeeded"
+      with_items: '{{ pod_list.resources }}'

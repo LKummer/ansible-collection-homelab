@@ -16,7 +16,7 @@
 
 - name: Install curl
   become: true
-  ansible.builtin.apk:
+  ansible.builtin.package:
     name: curl
     state: present
 
