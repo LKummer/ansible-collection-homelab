@@ -1,9 +1,9 @@
 ---
 stages:
-  - lint
+  - test
 
 lint:
-  stage: lint
+  stage: test
   image: python:3.10.6-slim-bullseye
   script:
     - pip install poetry
@@ -11,3 +11,17 @@ lint:
     - poetry run ansible-galaxy install -r requirements.yml
     - poetry run ansible-lint -P production
     - poetry run yamllint .
+
+test:
+  stage: test
+  image: docker.houseofkummer.com/homelab/dockops:0.6.0
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: '0'
+  script:
+    - pip install poetry
+    - poetry install
+    - poetry run ansible-galaxy install -r requirements.yml
+    - cd roles/k3s
+    - poetry run molecule test
+    - cd ../prometheus
+    - poetry run molecule test
