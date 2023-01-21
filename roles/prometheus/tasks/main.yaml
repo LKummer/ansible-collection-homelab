@@ -5,20 +5,43 @@
     name: grafana
     repo_url: https://grafana.github.io/helm-charts
 
-- name: Deploy Loki stack Helm chart
+- name: Deploy Loki Helm chart
   become: true
+  tags:
+    - molecule-idempotence-notest
   kubernetes.core.helm:
     name: loki
-    chart_ref: grafana/loki-stack
-    chart_version: '{{ prometheus_loki_stack_version }}'
+    chart_ref: grafana/loki
+    chart_version: '{{ prometheus_loki_chart_version }}'
     release_namespace: prometheus
     create_namespace: true
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
     values:
       loki:
-        persistence:
-          enabled: true
+        # Disabling auth sets single tenant mode.
+        auth_enabled: false
+        # Setting replication factor and storage type to enable monolithic mode.
+        commonConfig:
+          replication_factor: 1
+        storage:
+          type: filesystem
+
+- name: Deploy Promtail
+  become: true
+  tags:
+    - molecule-idempotence-notest
+  kubernetes.core.helm:
+    name: promtail
+    chart_ref: grafana/promtail
+    chart_version: '{{ prometheus_promtail_chart_version }}'
+    release_namespace: prometheus
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    update_repo_cache: true
+    values:
+      config:
+        clients:
+          - url: http://loki:3100/loki/api/v1/push
 
 - name: Add Prometheus community Helm repository
   become: true
@@ -35,10 +58,12 @@
 # See https://github.com/prometheus-community/helm-charts/issues/108#issuecomment-703266597
 - name: Deploy Prometheus Operator Helm chart
   become: true
+  tags:
+    - molecule-idempotence-notest
   kubernetes.core.helm:
     name: prometheus
     chart_ref: prometheus-community/kube-prometheus-stack
-    chart_version: '{{ prometheus_kube_prometheus_stack_version }}'
+    chart_version: '{{ prometheus_kube_prometheus_stack_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
