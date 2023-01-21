@@ -21,7 +21,7 @@
         url: http://127.0.0.1/api/datasources
         url_password: admin
         url_username: admin
-        force_basic_auth: yes
+        force_basic_auth: true
         headers:
           Host: grafana.example.com
       register: grafana_datasources
@@ -30,8 +30,8 @@
       ansible.builtin.assert:
         that:
           - (grafana_datasources.json | length) == 2
-          - "'Loki' in (grafana_datasources.json | map(attribute='typeName'))"
-          - "'Prometheus' in (grafana_datasources.json | map(attribute='typeName'))"
+          - '"Loki" in (grafana_datasources.json | map(attribute="typeName"))'
+          - '"Prometheus" in (grafana_datasources.json | map(attribute="typeName"))'
 
     - name: Query Loki through Grafana
       ansible.builtin.uri:
@@ -39,7 +39,7 @@
         url: http://127.0.0.1/api/ds/query
         url_password: admin
         url_username: admin
-        force_basic_auth: yes
+        force_basic_auth: true
         body:
           queries:
             - refId: A
@@ -65,7 +65,7 @@
         url: http://127.0.0.1/api/ds/query
         url_password: admin
         url_username: admin
-        force_basic_auth: yes
+        force_basic_auth: true
         body:
           queries:
             - refId: A
