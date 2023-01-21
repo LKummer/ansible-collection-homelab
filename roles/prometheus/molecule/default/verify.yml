@@ -1,0 +1,88 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Get all Kubernetes pods
+      become: true
+      kubernetes.core.k8s_info:
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        kind: Pod
+      register: pod_list
+
+    - name: All pods are running or completed
+      ansible.builtin.assert:
+        that: item.status.phase == "Running" or item.status.phase == "Succeeded"
+        quiet: true
+      with_items: '{{ pod_list.resources }}'
+
+    - name: Get Grafana data sources
+      ansible.builtin.uri:
+        url: http://127.0.0.1/api/datasources
+        url_password: admin
+        url_username: admin
+        force_basic_auth: yes
+        headers:
+          Host: grafana.example.com
+      register: grafana_datasources
+
+    - name: Verify Grafana has Prometheus and Loki data sources
+      ansible.builtin.assert:
+        that:
+          - (grafana_datasources.json | length) == 2
+          - "'Loki' in (grafana_datasources.json | map(attribute='typeName'))"
+          - "'Prometheus' in (grafana_datasources.json | map(attribute='typeName'))"
+
+    - name: Query Loki through Grafana
+      ansible.builtin.uri:
+        method: POST
+        url: http://127.0.0.1/api/ds/query
+        url_password: admin
+        url_username: admin
+        force_basic_auth: yes
+        body:
+          queries:
+            - refId: A
+              datasource:
+                uid: '{{ grafana_datasources.json[0].uid }}'
+              expr: '{pod=~"promtail.*"}'
+              maxLines: 100
+              intervalMs: 2000
+          from: now-1d
+          to: now
+        body_format: json
+        headers:
+          Host: grafana.example.com
+      register: grafana_loki_query
+
+    - name: Verify Loki contains logs from Promtail
+      ansible.builtin.assert:
+        that: 0 < (grafana_loki_query.json.results.A.frames[0].data['values'][0] | length)
+
+    - name: Query Prometheus through Grafana
+      ansible.builtin.uri:
+        method: POST
+        url: http://127.0.0.1/api/ds/query
+        url_password: admin
+        url_username: admin
+        force_basic_auth: yes
+        body:
+          queries:
+            - refId: A
+              datasource:
+                uid: '{{ grafana_datasources.json[1].uid }}'
+              expr: '{job="kube-state-metrics"}'
+              maxDataPoints: 100
+              intervalMs: 2000
+          from: now-1d
+          to: now
+        body_format: json
+        headers:
+          Host: grafana.example.com
+      register: grafana_prometheus_query
+
+    - name: Verify Prometheus contains metrics from ServiceMonitor
+      ansible.builtin.assert:
+        # Prometheus takes time to scrape metrics, checking it actually returns
+        # metrics requires more wait after converging.
+        that: 0 <= (grafana_prometheus_query.json.results.A.frames | length)

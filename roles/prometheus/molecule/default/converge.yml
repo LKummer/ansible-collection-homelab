@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include homelab.k3s
+      ansible.builtin.include_role:
+        name: k3s
+
+    - name: Include homelab.k3s
+      ansible.builtin.include_role:
+        name: prometheus
+      vars:
+        prometheus_grafana_host: grafana.example.com
+        prometheus_grafana_user: admin
+        prometheus_grafana_password: admin
+
+    - name: Wait for pods to start up
+      ansible.builtin.wait_for:
+        timeout: 15

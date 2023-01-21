@@ -8,4 +8,4 @@
 
     - name: Wait to let pods start up
       ansible.builtin.wait_for:
-        timeout: 30
+        timeout: 15
