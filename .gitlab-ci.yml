@@ -12,7 +12,7 @@ lint:
     - poetry run ansible-lint -P production
     - poetry run yamllint .
 
-test:
+test-k3s:
   stage: test
   image: docker.houseofkummer.com/homelab/dockops:0.6.0
   variables:
@@ -23,9 +23,47 @@ test:
     - poetry run ansible-galaxy install -r requirements.yml
     - cd roles/k3s
     - poetry run molecule test
-    - cd ../prometheus
+
+test-prometheus:
+  stage: test
+  image: docker.houseofkummer.com/homelab/dockops:0.6.0
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: '0'
+  script:
+    - pip install poetry
+    - poetry install
+    - poetry run ansible-galaxy install -r requirements.yml
+    - cd roles/prometheus
     - poetry run molecule test
-    - cd ../argo
+  # Job dependencies are used to limit execution to one job at a time to conserve
+  # resources, as each job creates a VM.
+  needs:
+    - test-k3s
+
+test-argo:
+  stage: test
+  image: docker.houseofkummer.com/homelab/dockops:0.6.0
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: '0'
+  script:
+    - pip install poetry
+    - poetry install
+    - poetry run ansible-galaxy install -r requirements.yml
+    - cd roles/argo
     - poetry run molecule test
-    - cd ../cert_manager
+  needs:
+    - test-prometheus
+
+test-cert-manager:
+  stage: test
+  image: docker.houseofkummer.com/homelab/dockops:0.6.0
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: '0'
+  script:
+    - pip install poetry
+    - poetry install
+    - poetry run ansible-galaxy install -r requirements.yml
+    - cd roles/cert_manager
     - poetry run molecule test
+  needs:
+    - test-argo
