@@ -25,3 +25,5 @@ test:
     - poetry run molecule test
     - cd ../prometheus
     - poetry run molecule test
+    - cd ../argo
+    - poetry run molecule test

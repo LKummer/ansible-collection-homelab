@@ -1,0 +1,58 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include homelab.k3s
+      ansible.builtin.include_role:
+        name: k3s
+
+    - name: Include homelab.k3s
+      ansible.builtin.include_role:
+        name: prometheus
+      vars:
+        prometheus_grafana_host: grafana.example.com
+        prometheus_grafana_user: admin
+        prometheus_grafana_password: admin
+
+    - name: Include homelab.argo
+      ansible.builtin.include_role:
+        name: argo
+      vars:
+        argo_host: argo.example.com
+        argo_cert_manager_enabled: false
+
+    - name: Namespace for test application is present
+      become: true
+      kubernetes.core.k8s:
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        api_version: v1
+        kind: namespace
+        name: test
+
+    - name: ArgoCD Application is present
+      become: true
+      kubernetes.core.k8s:
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        namespace: argo-cd
+        definition:
+          apiVersion: argoproj.io/v1alpha1
+          kind: Application
+          metadata:
+            name: test
+          spec:
+            project: default
+            source:
+              chart: redis
+              repoURL: https://charts.bitnami.com/bitnami
+              targetRevision: 17.x
+              helm:
+                releaseName: redis
+            destination:
+              server: https://kubernetes.default.svc
+              namespace: test
+            syncPolicy:
+              automated: {}
+
+    - name: Wait for pods to start up
+      ansible.builtin.wait_for:
+        timeout: 30

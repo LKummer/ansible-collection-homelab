@@ -1,0 +1,53 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_log: '{{ molecule_no_log }}'
+  tasks:
+    - name: Ensure test secrets directory exists
+      ansible.builtin.file:
+        path: /tmp/homelab-collection-test/secrets
+        state: directory
+        mode: '0700'
+
+    - name: Generate SSH key pair
+      community.crypto.openssh_keypair:
+        path: /tmp/homelab-collection-test/secrets/id_k3s_test
+        type: ed25519
+      register: ssh_keypair
+
+    - name: Initialize Terraform
+      ansible.builtin.command:
+        chdir: terraform
+        cmd: terraform init
+      changed_when: false
+
+    - name: Apply Terraform to create VM
+      ansible.builtin.command:
+        chdir: terraform
+        cmd: terraform apply -var 'cloud_init_public_keys={{ ssh_keypair.public_key }}' -auto-approve
+      changed_when: true
+      register: server
+
+    - name: Read Terraform outputs from state
+      ansible.builtin.set_fact:
+        tf_outputs: '{{ (lookup("file", "terraform/terraform.tfstate") | from_json).outputs }}'
+
+    - name: Convert instance config dict to a list
+      ansible.builtin.set_fact:
+        instance_conf:
+          - instance: instance
+            address: '{{ tf_outputs.ssh_ip.value }}'
+            user: '{{ tf_outputs.user.value }}'
+            port: '{{ tf_outputs.ssh_port.value | string }}'
+            identity_file: '{{ ssh_keypair.filename }}'
+
+    - name: Dump instance config
+      ansible.builtin.copy:
+        content: |
+          # Molecule managed
+
+          {{ instance_conf | to_yaml }}
+        dest: '{{ molecule_instance_config }}'
+        mode: '0600'
