@@ -27,3 +27,5 @@ test:
     - poetry run molecule test
     - cd ../argo
     - poetry run molecule test
+    - cd ../cert_manager
+    - poetry run molecule test

@@ -1,0 +1,56 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include homelab.k3s
+      ansible.builtin.include_role:
+        name: k3s
+
+    - name: Include homelab.cert_manager
+      ansible.builtin.include_role:
+        name: cert_manager
+      vars:
+        cert_manager_cloudflare_email: unused@exmaple.com
+        cert_manager_cloudflare_token: UNUSED
+        cert_manager_cloudflare_zone: UNUSED
+
+    - name: Wait for pods to start up
+      ansible.builtin.wait_for:
+        timeout: 30
+
+    - name: SelfSigned Issuer is present
+      become: true
+      kubernetes.core.k8s:
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        namespace: cert-manager
+        definition:
+          apiVersion: cert-manager.io/v1
+          kind: Issuer
+          metadata:
+            name: test
+            namespace: cert-manager
+          spec:
+            selfSigned: {}
+
+    - name: SelfSigned Issuer is present
+      become: true
+      kubernetes.core.k8s:
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        namespace: cert-manager
+        definition:
+          apiVersion: cert-manager.io/v1
+          kind: Certificate
+          metadata:
+            name: test-ca
+            namespace: cert-manager
+          spec:
+            isCA: true
+            commonName: test
+            secretName: test-ca
+            privateKey:
+              algorithm: ECDSA
+              size: 256
+            issuerRef:
+              name: test
+              kind: Issuer
+              group: cert-manager.io
