@@ -49,13 +49,6 @@
     name: prometheus-community
     repo_url: https://prometheus-community.github.io/helm-charts
 
-# IMPORTANT NOTE
-# Deleting the namespace this chart is in does not delete all resources, new
-# installation will fail.
-# Delete webhooks manually:
-# $ kubectl delete validatingwebhookconfiguration/prometheus-kube-prometheus-admission
-# $ kubectl delete mutatingwebhookconfiguration/prometheus-kube-prometheus-admission
-# See https://github.com/prometheus-community/helm-charts/issues/108#issuecomment-703266597
 - name: Deploy Prometheus Operator Helm chart
   become: true
   tags:
@@ -73,7 +66,7 @@
       kubeEtcd:
         enabled: false
 
-      # Disabled to avoid crashing node exporter on K3s.
+      # Disabled because it requires mounting / of the root filesystem.
       nodeExporter:
         enabled: false
 
