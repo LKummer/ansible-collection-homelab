@@ -6,9 +6,9 @@ Roles:
 
 * `lkummer.homelab.argo` configures ArgoCD.
 * `lkummer.homelab.cert_manager` configures Cert Manager and a ClusterIssuer using Let's Encrypt and Cloudflare DNS.
-* `lkummer.homelab.helm` configures hosts for use with `kubernetes.core.helm` and `kubernetes.core.k8s` modules.
 * `lkummer.homelab.k3s` configures K3s.
 * `lkummer.homelab.prometheus` configures Prometheus Operator, Grafana, Loki and Promtail.
+* `lkummer.homelab.helm` configures hosts for use with `kubernetes.core.helm` and `kubernetes.core.k8s` modules.
 
 Inventory plugins:
 
@@ -46,7 +46,7 @@ collections:
   - name: lkummer.homelab
     type: git
     source: https://github.com/LKummer/ansible-collection-homelab.git
-    version: 1.0.0
+    version: 3.0.0
 ```
 
 Install with the requirements file.
@@ -56,6 +56,9 @@ ansible-galaxy collection install --requirements requirements.yaml
 ```
 
 ## Documentation
+
+[Full documentation is available on the wiki](https://homelab.pages.houseofkummer.com/devops/wiki/).
+The following instructions are for accessing less detailed documentation from the roles and plugins.
 
 For role variable documentation, see:
 
@@ -77,29 +80,98 @@ ansible-doc --type inventory lkummer.homelab.terraform_local
 
 ## Development
 
+This project uses Poetry to manage dependencies in a virtual environment.
+
 Install Poetry as it is required to download development dependencies:
+
+To install Poetry, run:
 
 ```
 pip install poetry
 ```
 
-Install the dependencies:
+To install development dependencies, run:
 
 ```
 poetry install
 ```
 
-Once installation finishes, use `poetry shell` to open a shell where you can run linters:
+Commands must run inside `poetry shell` or using `poetry run` because everything required for
+development is installed in a virtual environment, including Ansible, Molecule, and the linters.
+
+To activate the virtual environment, run:
 
 ```
 poetry shell
+```
+
+Or use `poetry run` without activating the virtual environment.
+This example runs `ansible-lint`:
+
+```
+poetry run ansible-lint -P production
+```
+
+### Testing
+
+`PM_API_TOKEN_ID` and `PM_API_TOKEN_SECRET` must be set.
+Make sure the token id is of the form `user@pve!token` and contains your username, realm and token name.
+Make sure the token has enough privileges for cloning VMs.
+[For more information see this guide.](https://homelab.pages.houseofkummer.com/devops/wiki/how-to/proxmox-api-tokens/)
+
+Set `ANSIBLE_HOST_KEY_CHECKING=0` to prevent Ansible from bugging you about SSH host key verification.
+
+Each user facing role (`k3s`, `prometheus`, `argo`, `cert_manager`) has a Molecule test.
+To run a test, first go to the directory of the role you want to test:
+
+```
+cd roles/prometheus
+```
+
+Then run Molecule with the following command:
+
+```
+molecule test
+```
+
+It is useful to run Molecule stages during role development, using the test as a machine and playbook for development.
+
+To provision a machine for testing, run:
+
+```
+molecule create
+```
+
+To run the playbook of the role, run:
+
+```
+molecule converge
+```
+
+To run the test verification playbook, run:
+
+```
+molecule verify
+```
+
+To destroy infrastructure provisioned for the test, run:
+
+```
+molecule destroy
 ```
 
 ### Linting
 
 Make sure to lint with both yamllint and ansible-lint before pushing.
 
+To lint with `yamllint`, run:
+
 ```
 yamllint .
+```
+
+To lint with `ansible-lint`, run:
+
+```
 ansible-lint -P production
 ```
