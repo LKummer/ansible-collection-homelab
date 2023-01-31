@@ -38,9 +38,10 @@ Included roles are designed to work together to configure a single host Kubernet
 
 ## Installation
 
-Add the collection to your requirements file.
+Add the collection to the `requirements.yml` file at the root directory of your playbook.
 
 ```yaml
+# Inside requirements.yml
 ---
 collections:
   - name: lkummer.homelab
@@ -49,10 +50,10 @@ collections:
     version: 3.0.0
 ```
 
-Install with the requirements file.
+Install requirements from the file:
 
 ```
-ansible-galaxy collection install --requirements requirements.yaml
+ansible-galaxy collection install --requirements requirements.yml
 ```
 
 ## Documentation
