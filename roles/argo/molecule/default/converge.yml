@@ -6,13 +6,22 @@
       ansible.builtin.include_role:
         name: k3s
 
-    - name: Include homelab.k3s
+    - name: Include homelab.cert_manager
+      ansible.builtin.include_role:
+        name: cert_manager
+      vars:
+        cert_manager_cloudflare_email: unused@exmaple.com
+        cert_manager_cloudflare_token: UNUSED
+        cert_manager_cloudflare_zone: UNUSED
+
+    - name: Include homelab.prometheus
       ansible.builtin.include_role:
         name: prometheus
       vars:
         prometheus_grafana_host: grafana.example.com
         prometheus_grafana_user: admin
         prometheus_grafana_password: admin
+        prometheus_jaeger_host: jaeger.example.com
 
     - name: Include homelab.argo
       ansible.builtin.include_role:
