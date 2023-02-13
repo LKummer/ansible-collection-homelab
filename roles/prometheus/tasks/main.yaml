@@ -99,6 +99,9 @@
               - name: Loki
                 type: loki
                 url: http://loki:3100
+              - name: Jaeger
+                type: jaeger
+                url: http://jaeger-jaeger-operator-jaeger-query.prometheus:16686
 
         grafana.ini:
           analytics:
@@ -120,3 +123,33 @@
             - secretName: grafana-tls
               hosts:
                 - '{{ prometheus_grafana_host }}'
+
+- name: Deploy Jaeger Operator chart
+  become: true
+  tags:
+    - molecule-idempotence-notest
+  kubernetes.core.helm:
+    name: jaeger
+    chart_ref: jaeger-operator
+    chart_repo_url: https://jaegertracing.github.io/helm-charts
+    chart_version: '{{ prometheus_jaeger_operator_chart_version }}'
+    release_namespace: prometheus
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    update_repo_cache: true
+    values:
+      rbac:
+        clusterRole: true
+      jaeger:
+        create: true
+        spec:
+          strategy: allInOne
+          ingress:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt
+            hosts:
+              - '{{ prometheus_jaeger_host }}'
+            tls:
+              - hosts:
+                  - '{{ prometheus_jaeger_host }}'
+                secretName: jaeger-tls

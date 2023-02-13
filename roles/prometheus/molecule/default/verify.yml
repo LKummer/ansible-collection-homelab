@@ -29,9 +29,10 @@
     - name: Verify Grafana has Prometheus and Loki data sources
       ansible.builtin.assert:
         that:
-          - (grafana_datasources.json | length) == 2
+          - (grafana_datasources.json | length) == 3
           - '"Loki" in (grafana_datasources.json | map(attribute="typeName"))'
           - '"Prometheus" in (grafana_datasources.json | map(attribute="typeName"))'
+          - '"Jaeger" in (grafana_datasources.json | map(attribute="typeName"))'
 
     - name: Query Loki through Grafana
       ansible.builtin.uri:
@@ -44,7 +45,7 @@
           queries:
             - refId: A
               datasource:
-                uid: '{{ grafana_datasources.json[0].uid }}'
+                uid: '{{ grafana_datasources.json[1].uid }}'
               expr: '{pod=~"promtail.*"}'
               maxLines: 100
               intervalMs: 2000
@@ -70,7 +71,7 @@
           queries:
             - refId: A
               datasource:
-                uid: '{{ grafana_datasources.json[1].uid }}'
+                uid: '{{ grafana_datasources.json[2].uid }}'
               expr: '{job="kube-state-metrics"}'
               maxDataPoints: 100
               intervalMs: 2000
