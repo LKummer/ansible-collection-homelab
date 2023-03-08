@@ -26,6 +26,15 @@
           replication_factor: 1
         storage:
           type: filesystem
+      singleBinary:
+        replicas: 1
+        extraEnv:
+          - name: JAEGER_AGENT_HOST
+            value: collector-collector
+          - name: JAEGER_SAMPLER_TYPE
+            value: const
+          - name: JAEGER_SAMPLER_PARAM
+            value: '1'
 
 - name: Deploy Promtail
   become: true
@@ -124,6 +133,7 @@
               hosts:
                 - '{{ prometheus_grafana_host }}'
 
+# TODO Scrape metrics from Jaeger.
 - name: Deploy Jaeger Operator chart
   become: true
   tags:
@@ -153,3 +163,61 @@
               - hosts:
                   - '{{ prometheus_jaeger_host }}'
                 secretName: jaeger-tls
+
+- name: Deploy OpenTelemetry Operator chart
+  become: true
+  tags:
+    - molecule-idempotence-notest
+  kubernetes.core.helm:
+    name: opentelemetry
+    chart_ref: opentelemetry-operator
+    chart_repo_url: https://open-telemetry.github.io/opentelemetry-helm-charts
+    chart_version: '{{ prometheus_opentelemetry_operator_chart_version }}'
+    release_namespace: prometheus
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    update_repo_cache: true
+
+# TODO Export metrics from the collector.
+- name: Deploy OpenTelemetry Collector
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: prometheus
+    definition:
+      apiVersion: opentelemetry.io/v1alpha1
+      kind: OpenTelemetryCollector
+      metadata:
+        name: collector
+        labels:
+          app.kubernetes.io/name: opentelemetry-collector
+          app.kubernetes.io/component: collector
+          app.kubernetes.io/managed-by: ansible
+      spec:
+        config: |
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                http:
+            jaeger:
+              protocols:
+                grpc:
+                thrift_binary:
+                thrift_compact:
+                thrift_http:
+
+          processors:
+
+          exporters:
+            logging:
+            otlp:
+              endpoint: jaeger-jaeger-operator-jaeger-collector:4317
+              tls:
+                insecure: true
+
+          service:
+            pipelines:
+              traces:
+                receivers: [otlp, jaeger]
+                processors: []
+                exporters: [otlp]
