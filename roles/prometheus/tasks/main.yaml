@@ -176,6 +176,7 @@
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
+    wait: true
 
 # TODO Export metrics from the collector.
 - name: Deploy OpenTelemetry Collector
