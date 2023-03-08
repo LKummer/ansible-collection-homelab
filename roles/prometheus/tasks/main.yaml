@@ -108,9 +108,9 @@
               - name: Loki
                 type: loki
                 url: http://loki:3100
-              - name: Jaeger
-                type: jaeger
-                url: http://jaeger-jaeger-operator-jaeger-query.prometheus:16686
+              - name: Tempo
+                type: tempo
+                url: http://tempo:3100
 
         grafana.ini:
           analytics:
@@ -133,36 +133,26 @@
               hosts:
                 - '{{ prometheus_grafana_host }}'
 
-# TODO Scrape metrics from Jaeger.
-- name: Deploy Jaeger Operator chart
+- name: Deploy Grafana Tempo
   become: true
   tags:
     - molecule-idempotence-notest
   kubernetes.core.helm:
-    name: jaeger
-    chart_ref: jaeger-operator
-    chart_repo_url: https://jaegertracing.github.io/helm-charts
-    chart_version: '{{ prometheus_jaeger_operator_chart_version }}'
+    name: tempo
+    chart_ref: tempo
+    chart_repo_url: https://grafana.github.io/helm-charts
+    chart_version: '{{ prometheus_tempo_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
     values:
-      rbac:
-        clusterRole: true
-      jaeger:
-        create: true
-        spec:
-          strategy: allInOne
-          ingress:
-            enabled: true
-            annotations:
-              cert-manager.io/cluster-issuer: letsencrypt
-            hosts:
-              - '{{ prometheus_jaeger_host }}'
-            tls:
-              - hosts:
-                  - '{{ prometheus_jaeger_host }}'
-                secretName: jaeger-tls
+      persistence:
+        enabled: true
+      tempo:
+        reportingEnabled: false
+        metricsGenerator:
+          enabled: true
+          remoteWriteUrl: http://prometheus-kube-prometheus-prometheus:9090/api/v1/write
 
 - name: Deploy OpenTelemetry Operator chart
   become: true
@@ -178,7 +168,6 @@
     update_repo_cache: true
     wait: true
 
-# TODO Export metrics from the collector.
 - name: Deploy OpenTelemetry Collector
   become: true
   kubernetes.core.k8s:
@@ -212,7 +201,7 @@
           exporters:
             logging:
             otlp:
-              endpoint: jaeger-jaeger-operator-jaeger-collector:4317
+              endpoint: tempo:4317
               tls:
                 insecure: true
 
