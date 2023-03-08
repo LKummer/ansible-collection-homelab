@@ -32,7 +32,7 @@
           - (grafana_datasources.json | length) == 3
           - '"Loki" in (grafana_datasources.json | map(attribute="typeName"))'
           - '"Prometheus" in (grafana_datasources.json | map(attribute="typeName"))'
-          - '"Jaeger" in (grafana_datasources.json | map(attribute="typeName"))'
+          - '"Tempo" in (grafana_datasources.json | map(attribute="typeName"))'
 
     - name: Query Loki through Grafana
       ansible.builtin.uri:
