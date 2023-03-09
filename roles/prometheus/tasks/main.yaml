@@ -211,3 +211,31 @@
                 receivers: [otlp, jaeger]
                 processors: []
                 exporters: [otlp]
+
+- name: Deploy OpenTelemetry Collector internal metrics PodMonitor
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: prometheus
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PodMonitor
+      metadata:
+        name: opentelemetry-collector
+        labels:
+          app.kubernetes.io/name: opentelemetry-collector
+          app.kubernetes.io/component: monitoring
+          app.kubernetes.io/managed-by: ansible
+          release: prometheus
+      spec:
+        endpoints:
+        podMetricsEndpoints:
+          - port: metrics
+        jobLabel: opentelemetry-collector
+        namespaceSelector:
+          matchNames:
+            - prometheus
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: collector-collector
+            app.kubernetes.io/component: opentelemetry-collector
