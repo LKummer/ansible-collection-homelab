@@ -7,7 +7,7 @@ Roles:
 * `lkummer.homelab.argo` configures ArgoCD.
 * `lkummer.homelab.cert_manager` configures Cert Manager and a ClusterIssuer using Let's Encrypt and Cloudflare DNS.
 * `lkummer.homelab.k3s` configures K3s.
-* `lkummer.homelab.prometheus` configures Prometheus Operator, Grafana, Loki and Promtail.
+* `lkummer.homelab.observability` configures Prometheus Operator, Grafana Agent, Grafana, Loki, Promtail, OpenTelemetry Operator, OpenTelemetry Collector and Tempo.
 * `lkummer.homelab.helm` configures hosts for use with `kubernetes.core.helm` and `kubernetes.core.k8s` modules.
 
 Inventory plugins:
@@ -25,11 +25,11 @@ Included roles are designed to work together to configure a single host Kubernet
   hosts: production
   roles:
     - role: lkummer.homelab.k3s
-    - role: lkummer.homelab.prometheus
+    - role: lkummer.homelab.observability
       vars:
-        prometheus_grafana_host: grafana.example.com
-        prometheus_grafana_user: admin
-        prometheus_grafana_password: admin
+        observability_grafana_host: grafana.example.com
+        observability_grafana_user: admin
+        observability_grafana_password: admin
     - role: lkummer.homelab.argo
       vars:
         argo_host: argo.example.com
@@ -122,11 +122,11 @@ Make sure the token has enough privileges for cloning VMs.
 
 Set `ANSIBLE_HOST_KEY_CHECKING=0` to prevent Ansible from bugging you about SSH host key verification.
 
-Each user facing role (`k3s`, `prometheus`, `argo`, `cert_manager`) has a Molecule test.
+Each user facing role (`k3s`, `observability`, `argo`, `cert_manager`) has a Molecule test.
 To run a test, first go to the directory of the role you want to test:
 
 ```
-cd roles/prometheus
+cd roles/observability
 ```
 
 Then run Molecule with the following command:

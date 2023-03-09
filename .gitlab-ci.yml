@@ -24,7 +24,7 @@ test-k3s:
     - cd roles/k3s
     - poetry run molecule test
 
-test-prometheus:
+test-observability:
   stage: test
   image: docker.houseofkummer.com/homelab/dockops:0.6.0
   variables:
@@ -33,7 +33,7 @@ test-prometheus:
     - pip install poetry
     - poetry install
     - poetry run ansible-galaxy install -r requirements.yml
-    - cd roles/prometheus
+    - cd roles/observability
     - poetry run molecule test
   # Job dependencies are used to limit execution to one job at a time to conserve
   # resources, as each job creates a VM.
@@ -52,7 +52,7 @@ test-argo:
     - cd roles/argo
     - poetry run molecule test
   needs:
-    - test-prometheus
+    - test-observability
 
 test-cert-manager:
   stage: test

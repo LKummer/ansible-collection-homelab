@@ -14,14 +14,14 @@
         cert_manager_cloudflare_token: UNUSED
         cert_manager_cloudflare_zone: UNUSED
 
-    - name: Include homelab.prometheus
+    - name: Include homelab.observability
       ansible.builtin.include_role:
-        name: prometheus
+        name: observability
       vars:
-        prometheus_grafana_host: grafana.example.com
-        prometheus_grafana_user: admin
-        prometheus_grafana_password: admin
-        prometheus_jaeger_host: jaeger.example.com
+        observability_grafana_host: grafana.example.com
+        observability_grafana_user: admin
+        observability_grafana_password: admin
+        observability_jaeger_host: jaeger.example.com
 
     - name: Include homelab.argo
       ansible.builtin.include_role:

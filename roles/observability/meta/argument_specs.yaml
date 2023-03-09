@@ -2,47 +2,47 @@
 argument_specs:
   main:
     short_description: >
-      Configures Prometheus Operator, Grafana, Loki and Promtail.
+      Configures a centralized observability stack for collecting logs, metrics and traces.
     options:
-      prometheus_kube_prometheus_stack_chart_version:
+      observability_kube_prometheus_stack_chart_version:
         type: str
         default: 44.2.1
         description: >
           Version of prometheus-community/kube-prometheus-stack Helm chart
           deployed.
-      prometheus_loki_chart_version:
+      observability_loki_chart_version:
         type: str
         default: 4.4.0
         description: Version of grafana/loki Helm chart deployed.
-      prometheus_promtail_chart_version:
+      observability_promtail_chart_version:
         type: str
         default: 6.8.1
         description: Version of grafana/promtail Helm chart deployed.
-      prometheus_jaeger_operator_chart_version:
+      observability_jaeger_operator_chart_version:
         type: str
         default: 2.39.0
         description: Version of jaegertracing/jaeger-operator Helm chart deployed.
-      prometheus_jaeger_host:
+      observability_jaeger_host:
         type: str
         required: true
         description: Hostname of the Jaeger instance.
-      prometheus_grafana_host:
+      observability_grafana_host:
         type: str
         required: true
         description: Hostname of the Grafana instance.
-      prometheus_grafana_user:
+      observability_grafana_user:
         type: str
         required: true
         description: Username of the default Grafana administrator.
-      prometheus_grafana_password:
+      observability_grafana_password:
         type: str
         required: true
         description: Password of the default Grafana administrator.
-      prometheus_service_monitor_selector:
+      observability_service_monitor_selector:
         type: dict
         default: {}
         description: Default service monitor selector for Prometheus.
-      prometheus_pod_monitor_selector:
+      observability_pod_monitor_selector:
         type: dict
         default: {}
         description: Default pod monitor selector for Prometheus.

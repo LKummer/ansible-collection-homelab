@@ -7,7 +7,7 @@
     name: loki
     chart_ref: loki
     chart_repo_url: https://grafana.github.io/helm-charts
-    chart_version: '{{ prometheus_loki_chart_version }}'
+    chart_version: '{{ observability_loki_chart_version }}'
     release_namespace: prometheus
     create_namespace: true
     kubeconfig: /etc/rancher/k3s/k3s.yaml
@@ -39,7 +39,7 @@
     name: promtail
     chart_ref: promtail
     chart_repo_url: https://grafana.github.io/helm-charts
-    chart_version: '{{ prometheus_promtail_chart_version }}'
+    chart_version: '{{ observability_promtail_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
@@ -56,7 +56,7 @@
     name: prometheus
     chart_ref: kube-prometheus-stack
     chart_repo_url: https://prometheus-community.github.io/helm-charts
-    chart_version: '{{ prometheus_kube_prometheus_stack_chart_version }}'
+    chart_version: '{{ observability_kube_prometheus_stack_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
@@ -72,8 +72,8 @@
 
       prometheus:
         prometheusSpec:
-          serviceMonitorSelector: '{{ prometheus_service_monitor_selector }}'
-          podMonitorSelector: '{{ prometheus_pod_monitor_selector }}'
+          serviceMonitorSelector: '{{ observability_service_monitor_selector }}'
+          podMonitorSelector: '{{ observability_pod_monitor_selector }}'
 
           storageSpec:
             volumeClaimTemplate:
@@ -86,8 +86,8 @@
                   - ReadWriteOnce
 
       grafana:
-        adminUser: '{{ prometheus_grafana_user }}'
-        adminPassword: '{{ prometheus_grafana_password }}'
+        adminUser: '{{ observability_grafana_user }}'
+        adminPassword: '{{ observability_grafana_password }}'
 
         datasources:
           datasources.yaml:
@@ -117,12 +117,12 @@
             cert-manager.io/cluster-issuer: letsencrypt
 
           hosts:
-            - '{{ prometheus_grafana_host }}'
+            - '{{ observability_grafana_host }}'
 
           tls:
             - secretName: grafana-tls
               hosts:
-                - '{{ prometheus_grafana_host }}'
+                - '{{ observability_grafana_host }}'
 
 - name: Deploy Grafana Tempo
   become: true
@@ -132,7 +132,7 @@
     name: tempo
     chart_ref: tempo
     chart_repo_url: https://grafana.github.io/helm-charts
-    chart_version: '{{ prometheus_tempo_chart_version }}'
+    chart_version: '{{ observability_tempo_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
@@ -153,7 +153,7 @@
     name: opentelemetry
     chart_ref: opentelemetry-operator
     chart_repo_url: https://open-telemetry.github.io/opentelemetry-helm-charts
-    chart_version: '{{ prometheus_opentelemetry_operator_chart_version }}'
+    chart_version: '{{ observability_opentelemetry_operator_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     update_repo_cache: true
