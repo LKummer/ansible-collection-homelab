@@ -1,17 +1,12 @@
 ---
-- name: Add ArgoCD Helm repository
-  become: true
-  kubernetes.core.helm_repository:
-    name: argo
-    repo_url: https://argoproj.github.io/argo-helm
-
 - name: ArgoCD is deployed
   become: true
   tags:
     - molecule-idempotence-notest
   kubernetes.core.helm:
     name: argocd
-    chart_ref: argo/argo-cd
+    chart_ref: argo-cd
+    chart_repo_url: https://argoproj.github.io/argo-helm
     chart_version: '{{ argo_chart_version }}'
     release_namespace: argo-cd
     create_namespace: true

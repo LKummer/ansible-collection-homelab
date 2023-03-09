@@ -1,17 +1,12 @@
 ---
-- name: Add Grafana Helm repository
-  become: true
-  kubernetes.core.helm_repository:
-    name: grafana
-    repo_url: https://grafana.github.io/helm-charts
-
 - name: Deploy Loki Helm chart
   become: true
   tags:
     - molecule-idempotence-notest
   kubernetes.core.helm:
     name: loki
-    chart_ref: grafana/loki
+    chart_ref: loki
+    chart_repo_url: https://grafana.github.io/helm-charts
     chart_version: '{{ prometheus_loki_chart_version }}'
     release_namespace: prometheus
     create_namespace: true
@@ -42,7 +37,8 @@
     - molecule-idempotence-notest
   kubernetes.core.helm:
     name: promtail
-    chart_ref: grafana/promtail
+    chart_ref: promtail
+    chart_repo_url: https://grafana.github.io/helm-charts
     chart_version: '{{ prometheus_promtail_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
@@ -52,19 +48,14 @@
         clients:
           - url: http://loki:3100/loki/api/v1/push
 
-- name: Add Prometheus community Helm repository
-  become: true
-  kubernetes.core.helm_repository:
-    name: prometheus-community
-    repo_url: https://prometheus-community.github.io/helm-charts
-
 - name: Deploy Prometheus Operator Helm chart
   become: true
   tags:
     - molecule-idempotence-notest
   kubernetes.core.helm:
     name: prometheus
-    chart_ref: prometheus-community/kube-prometheus-stack
+    chart_ref: kube-prometheus-stack
+    chart_repo_url: https://prometheus-community.github.io/helm-charts
     chart_version: '{{ prometheus_kube_prometheus_stack_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
@@ -228,7 +219,6 @@
           app.kubernetes.io/managed-by: ansible
           release: prometheus
       spec:
-        endpoints:
         podMetricsEndpoints:
           - port: metrics
         jobLabel: opentelemetry-collector
