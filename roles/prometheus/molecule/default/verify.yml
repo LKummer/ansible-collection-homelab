@@ -45,7 +45,7 @@
           queries:
             - refId: A
               datasource:
-                uid: '{{ grafana_datasources.json[1].uid }}'
+                uid: '{{ grafana_datasources.json[0].uid }}'
               expr: '{pod=~"promtail.*"}'
               maxLines: 100
               intervalMs: 2000
@@ -71,7 +71,7 @@
           queries:
             - refId: A
               datasource:
-                uid: '{{ grafana_datasources.json[2].uid }}'
+                uid: '{{ grafana_datasources.json[1].uid }}'
               expr: '{job="kube-state-metrics"}'
               maxDataPoints: 100
               intervalMs: 2000
