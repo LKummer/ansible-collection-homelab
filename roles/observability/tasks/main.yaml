@@ -11,7 +11,6 @@
     release_namespace: prometheus
     create_namespace: true
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    update_repo_cache: true
     values:
       loki:
         # Disabling auth sets single tenant mode.
@@ -42,7 +41,6 @@
     chart_version: '{{ observability_promtail_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    update_repo_cache: true
     values:
       config:
         clients:
@@ -59,7 +57,6 @@
     chart_version: '{{ observability_kube_prometheus_stack_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    update_repo_cache: true
     wait: true
     values:
       # Disabled because we are using K3s without etcd.
@@ -135,7 +132,6 @@
     chart_version: '{{ observability_tempo_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    update_repo_cache: true
     values:
       persistence:
         enabled: true
@@ -156,7 +152,6 @@
     chart_version: '{{ observability_opentelemetry_operator_chart_version }}'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    update_repo_cache: true
     wait: true
 
 - name: Deploy OpenTelemetry Collector
