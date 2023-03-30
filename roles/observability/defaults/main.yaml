@@ -1,5 +1,5 @@
 ---
-observability_kube_prometheus_stack_chart_version: 44.2.1
+observability_kube_prometheus_stack_chart_version: 45.8.1
 observability_loki_chart_version: 4.8.0
 observability_promtail_chart_version: 6.8.1
 observability_tempo_chart_version: 1.0.2

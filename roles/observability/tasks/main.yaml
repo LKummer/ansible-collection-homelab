@@ -86,23 +86,19 @@
         adminUser: '{{ observability_grafana_user }}'
         adminPassword: '{{ observability_grafana_password }}'
 
-        datasources:
-          datasources.yaml:
-            apiVersion: 1
-            datasources:
-              - name: Prometheus
-                type: prometheus
-                url: http://prometheus-kube-prometheus-prometheus.prometheus:9090
-                isDefault: true
-                orgId: 1
-              - name: Loki
-                type: loki
-                url: http://loki:3100
-                orgId: 1
-              - name: Tempo
-                type: tempo
-                url: http://tempo:3100
-                orgId: 1
+        additionalDataSources:
+          - name: Prometheus
+            type: prometheus
+            url: http://prometheus-kube-prometheus-prometheus.prometheus:9090
+            editable: false
+          - name: Loki
+            type: loki
+            url: http://loki:3100
+            editable: false
+          - name: Tempo
+            type: tempo
+            url: http://tempo:3100
+            editable: false
 
         grafana.ini:
           analytics:
