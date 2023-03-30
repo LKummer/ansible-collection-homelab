@@ -21,6 +21,7 @@
 
 - name: Secret with Cloudflare token is present
   become: true
+  when: cert_manager_clusterissuer_enabled
   kubernetes.core.k8s:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     namespace: cert-manager
@@ -39,6 +40,7 @@
 
 - name: ClusterIssuer is present
   become: true
+  when: cert_manager_clusterissuer_enabled
   kubernetes.core.k8s:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     namespace: cert-manager

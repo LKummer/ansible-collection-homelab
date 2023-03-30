@@ -10,6 +10,7 @@
       ansible.builtin.include_role:
         name: cert_manager
       vars:
+        cert_manager_clusterissuer_enabled: false
         cert_manager_cloudflare_email: unused@exmaple.com
         cert_manager_cloudflare_token: UNUSED
         cert_manager_cloudflare_zone: UNUSED
