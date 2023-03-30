@@ -11,7 +11,7 @@ module "machine" {
   name                   = "ansible-homelab-test-${random_uuid.id.result}"
   description            = "Created by ansible-collection-homelab automated testing suite."
   on_boot                = true
-  memory                 = 4096
+  memory                 = 6144
   cores                  = 4
   disk_pool              = "local-lvm"
   disk_size              = "10G"
