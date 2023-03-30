@@ -7,9 +7,9 @@ argument_specs:
         type: str
         required: true
         description: Hostname used for Ingress.
-      argo_version:
+      argo_chart_version:
         type: str
-        default: v2.4.11
+        default: 5.16.2
         description: ArgoCD version to use.
       argo_monitoring_enabled:
         type: bool
