@@ -26,10 +26,6 @@ argument_specs:
         type: str
         default: 0.23.0
         description: Version of OpenTelemetry Operator Helm chart deployed.
-      observability_jaeger_host:
-        type: str
-        required: true
-        description: Hostname of the Jaeger instance.
       observability_grafana_host:
         type: str
         required: true

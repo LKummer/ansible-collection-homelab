@@ -22,7 +22,6 @@
         observability_grafana_host: grafana.example.com
         observability_grafana_user: admin
         observability_grafana_password: admin
-        observability_jaeger_host: jaeger.example.com
 
     - name: Include homelab.argo
       ansible.builtin.include_role:

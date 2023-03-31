@@ -22,7 +22,6 @@
         observability_grafana_host: grafana.example.com
         observability_grafana_user: admin
         observability_grafana_password: admin
-        observability_jaeger_host: jaeger.example.com
 
     - name: Wait for pods to start up
       ansible.builtin.wait_for:
