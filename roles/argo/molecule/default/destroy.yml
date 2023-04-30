@@ -5,20 +5,13 @@
   gather_facts: false
   no_log: '{{ molecule_no_log }}'
   tasks:
-    - name: Initialize Terraform
-      ansible.builtin.command:
-        chdir: terraform
-        cmd: terraform init
-      changed_when: false
-
-    - name: Destroy VM
-      ansible.builtin.command:
-        chdir: terraform
-        cmd: terraform destroy -auto-approve
-      changed_when: true
+    - name: Destroy machine
+      cloud.terraform.terraform:
+        project_path: terraform/
+        force_init: true
+        state: absent
 
     # Mandatory configuration for Molecule to function.
-
     - name: Populate instance config
       ansible.builtin.set_fact:
         instance_conf: {}

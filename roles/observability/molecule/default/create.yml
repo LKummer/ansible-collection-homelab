@@ -17,30 +17,21 @@
         type: ed25519
       register: ssh_keypair
 
-    - name: Initialize Terraform
-      ansible.builtin.command:
-        chdir: terraform
-        cmd: terraform init
-      changed_when: false
+    - name: Create machine
+      cloud.terraform.terraform:
+        project_path: terraform/
+        force_init: true
+        variables:
+          cloud_init_public_keys: '{{ ssh_keypair.public_key }}'
+      register: tf_create
 
-    - name: Apply Terraform to create VM
-      ansible.builtin.command:
-        chdir: terraform
-        cmd: terraform apply -var 'cloud_init_public_keys={{ ssh_keypair.public_key }}' -auto-approve
-      changed_when: true
-      register: server
-
-    - name: Read Terraform outputs from state
-      ansible.builtin.set_fact:
-        tf_outputs: '{{ (lookup("file", "terraform/terraform.tfstate") | from_json).outputs }}'
-
-    - name: Convert instance config dict to a list
+    - name: Populate instance config
       ansible.builtin.set_fact:
         instance_conf:
           - instance: instance
-            address: '{{ tf_outputs.ssh_ip.value }}'
-            user: '{{ tf_outputs.user.value }}'
-            port: '{{ tf_outputs.ssh_port.value | string }}'
+            address: '{{ tf_create.outputs.ssh_ip.value }}'
+            user: '{{ tf_create.outputs.user.value }}'
+            port: '{{ tf_create.outputs.ssh_port.value | string }}'
             identity_file: '{{ ssh_keypair.filename }}'
 
     - name: Dump instance config
