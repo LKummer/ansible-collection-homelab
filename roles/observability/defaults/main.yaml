@@ -1,7 +1,7 @@
 ---
 observability_kube_prometheus_stack_chart_version: 45.8.1
 observability_loki_chart_version: 4.8.0
-observability_promtail_chart_version: 6.8.1
+observability_fluent_operator_chart_version: 2.2.0
 observability_tempo_chart_version: 1.0.2
 observability_opentelemetry_operator_chart_version: 0.23.0
 observability_service_monitor_selector: {}

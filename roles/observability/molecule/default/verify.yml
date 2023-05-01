@@ -46,7 +46,7 @@
             - refId: A
               datasource:
                 uid: '{{ grafana_datasources.json[0].uid }}'
-              expr: '{pod=~"promtail.*"}'
+              expr: '{job="fluentbit"}'
               maxLines: 100
               intervalMs: 2000
           from: now-1d

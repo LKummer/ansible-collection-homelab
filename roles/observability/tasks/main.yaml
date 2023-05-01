@@ -30,22 +30,6 @@
           - name: JAEGER_SAMPLER_PARAM
             value: '1'
 
-- name: Deploy Promtail
-  become: true
-  tags:
-    - molecule-idempotence-notest
-  kubernetes.core.helm:
-    name: promtail
-    chart_ref: promtail
-    chart_repo_url: https://grafana.github.io/helm-charts
-    chart_version: '{{ observability_promtail_chart_version }}'
-    release_namespace: prometheus
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    values:
-      config:
-        clients:
-          - url: http://loki:3100/loki/api/v1/push
-
 - name: Deploy Prometheus Operator Helm chart
   become: true
   tags:
@@ -190,6 +174,7 @@
               endpoint: tempo:4317
               tls:
                 insecure: true
+            # http://loki:3100/loki/api/v1/push
 
           service:
             pipelines:
@@ -224,3 +209,168 @@
           matchLabels:
             app.kubernetes.io/name: collector-collector
             app.kubernetes.io/component: opentelemetry-collector
+
+- name: Deploy Fluent operator
+  become: true
+  tags:
+    - molecule-idempotence-notest
+  kubernetes.core.helm:
+    name: fluent-operator
+    chart_ref: fluent-operator
+    chart_repo_url: https://fluent.github.io/helm-charts
+    chart_version: '{{ observability_fluent_operator_chart_version }}'
+    release_namespace: prometheus
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    values:
+      containerRuntime: containerd
+      # Disable the default FluentBit pipeline because it does not fit our stack.
+      kubernetes: false
+
+- name: Deploy FluentBit config
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: prometheus
+    definition:
+      apiVersion: fluentbit.fluent.io/v1alpha2
+      kind: ClusterFluentBitConfig
+      metadata:
+        name: config
+        labels:
+          app.kubernetes.io/name: fluent-bit
+          app.kubernetes.io/component: config
+          app.kubernetes.io/managed-by: ansible
+      spec:
+        inputSelector:
+          matchLabels:
+            fluentbit.fluent.io/enabled: 'true'
+            fluentbit.fluent.io/mode: k8s
+          filterSelector:
+            matchLabels:
+              fluentbit.fluent.io/enabled: 'true'
+              fluentbit.fluent.io/mode: k8s
+          outputSelector:
+            matchLabels:
+              fluentbit.fluent.io/enabled: 'true'
+              fluentbit.fluent.io/mode: k8s
+
+- name: Deploy FluentBit input config
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: prometheus
+    definition:
+      apiVersion: fluentbit.fluent.io/v1alpha2
+      kind: ClusterInput
+      metadata:
+        name: tail
+        labels:
+          fluentbit.fluent.io/enabled: 'true'
+          fluentbit.fluent.io/mode: k8s
+          app.kubernetes.io/name: fluent-bit
+          app.kubernetes.io/component: config
+          app.kubernetes.io/managed-by: ansible
+      spec:
+        tail:
+          tag: kube.*
+          path: /var/log/containers/*.log
+          # Exclude logs from util pod
+          excludePath: /var/log/containers/utils_default_utils-*.log
+          parser: cri
+          refreshIntervalSeconds: 10
+          memBufLimit: 5MB
+          skipLongLines: true
+          db: /fluent-bit/tail/pos.db
+          dbSync: Normal
+
+- name: Deploy FluentBit filter config
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: prometheus
+    definition:
+      apiVersion: fluentbit.fluent.io/v1alpha2
+      kind: ClusterFilter
+      metadata:
+        name: kubernetes
+        labels:
+          fluentbit.fluent.io/enabled: 'true'
+          fluentbit.fluent.io/mode: k8s
+          app.kubernetes.io/name: fluent-bit
+          app.kubernetes.io/component: config
+          app.kubernetes.io/managed-by: ansible
+      spec:
+        match: kube.*
+        filters:
+          - kubernetes:
+              labels: true
+              annotations: true
+          - nest:
+              operation: lift
+              nestedUnder: kubernetes
+              addPrefix: kubernetes_
+          - modify:
+              rules:
+                - remove: kubernetes_pod_id
+                - remove: kubernetes_container_hash
+                - remove: kubernetes_docker_id
+          - nest:
+              operation: nest
+              wildcard:
+                - kubernetes_*
+              nestUnder: kubernetes
+              removePrefix: kubernetes_
+
+- name: Deploy FluentBit output config
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: prometheus
+    definition:
+      apiVersion: fluentbit.fluent.io/v1alpha2
+      kind: ClusterOutput
+      metadata:
+        name: loki
+        labels:
+          fluentbit.fluent.io/enabled: 'true'
+          fluentbit.fluent.io/mode: k8s
+          app.kubernetes.io/name: fluent-bit
+          app.kubernetes.io/component: config
+          app.kubernetes.io/managed-by: ansible
+      spec:
+        matchRegex: (?:kube|service)\.(.*)
+        loki:
+          host: loki
+          labels:
+            - job=fluentbit
+
+- name: Deploy FluentBit
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: prometheus
+    definition:
+      apiVersion: fluentbit.fluent.io/v1alpha2
+      kind: FluentBit
+      metadata:
+        name: fluent-bit
+        namespace: prometheus
+        labels:
+          app.kubernetes.io/name: fluent-bit
+          app.kubernetes.io/component: bit
+          app.kubernetes.io/managed-by: ansible
+      spec:
+        image: kubesphere/fluent-bit:v1.8.11
+        positionDB:
+          hostPath:
+            path: /var/lib/fluent-bit/
+        resources:
+          requests:
+            cpu: 10m
+            memory: 25Mi
+          limits:
+            cpu: 500m
+            memory: 200Mi
+        fluentBitConfigName: config
+        tolerations:
+          - operator: Exists
