@@ -169,6 +169,11 @@
               endpoint: 0.0.0.0:8006
 
           processors:
+            attributes:
+              actions:
+                - action: insert
+                  key: loki.attribute.labels
+                  value: kubernetes.host, kubernetes.namespace_name, kubernetes.pod_name, kubernetes.container_name
 
           exporters:
             otlp:
@@ -186,7 +191,7 @@
                 exporters: [otlp]
               logs:
                 receivers: [otlp, fluentforward]
-                processors: []
+                processors: [attributes]
                 exporters: [loki]
 
 - name: Deploy OpenTelemetry Collector internal metrics PodMonitor
