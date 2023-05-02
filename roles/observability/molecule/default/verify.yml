@@ -72,7 +72,13 @@
             - refId: A
               datasource:
                 uid: '{{ grafana_datasources.json[1].uid }}'
-              expr: '{job="kube-state-metrics"}'
+              expr: '{scrape_job=~"serviceMonitor.*"}'
+              maxDataPoints: 100
+              intervalMs: 2000
+            - refId: B
+              datasource:
+                uid: '{{ grafana_datasources.json[1].uid }}'
+              expr: '{scrape_job=~"podMonitor.*"}'
               maxDataPoints: 100
               intervalMs: 2000
           from: now-1d
@@ -82,8 +88,12 @@
           Host: grafana.example.com
       register: grafana_prometheus_query
 
-    - name: Verify Prometheus contains metrics from ServiceMonitor
+    - name: Verify Prometheus contains metrics from ServiceMonitor resources
       ansible.builtin.assert:
         # Prometheus takes time to scrape metrics, checking it actually returns
         # metrics requires more wait after converging.
         that: 0 <= (grafana_prometheus_query.json.results.A.frames | length)
+
+    - name: Verify Prometheus contains metrics from PodMonitor resources
+      ansible.builtin.assert:
+        that: 0 <= (grafana_prometheus_query.json.results.B.frames | length)
