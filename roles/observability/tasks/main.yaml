@@ -173,7 +173,7 @@
               actions:
                 - action: insert
                   key: loki.attribute.labels
-                  value: kubernetes.host, kubernetes.namespace_name, kubernetes.pod_name, kubernetes.container_name
+                  value: kubernetes.host, kubernetes.namespace, kubernetes.pod, kubernetes.container
 
           exporters:
             otlp:
@@ -325,6 +325,10 @@
                 - remove: kubernetes_pod_id
                 - remove: kubernetes_container_hash
                 - remove: kubernetes_docker_id
+                - rename:
+                    kubernetes_container_name: kubernetes_container
+                    kubernetes_namespace_name: kubernetes_namespace
+                    kubernetes_pod_name: kubernetes_pod
           - nest:
               operation: nest
               wildcard:
