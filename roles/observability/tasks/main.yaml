@@ -53,8 +53,17 @@
 
       prometheus:
         prometheusSpec:
-          serviceMonitorSelector: '{{ observability_service_monitor_selector }}'
-          podMonitorSelector: '{{ observability_pod_monitor_selector }}'
+          serviceMonitorSelector:
+            matchLabels:
+              prometheus: in-cluster
+          podMonitorSelector:
+            matchLabels:
+              prometheus: in-cluster
+          additionalScrapeConfigs:
+            - job_name: opentelemetry-collector
+              static_configs:
+                - targets:
+                    - collector-collector:9000
 
           storageSpec:
             volumeClaimTemplate:
@@ -138,8 +147,94 @@
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     wait: true
 
+- name: Deploy ClusterRole for OpenTelemetry Collector Target Allocator
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        name: opentelemetry-collector-targetallocator
+        labels:
+          app.kubernetes.io/name: opentelemetry-collector
+          app.kubernetes.io/component: targetallocator
+          app.kubernetes.io/managed-by: ansible
+          rbac.authorization.k8s.io/aggregate-to-admin: 'true'
+          rbac.authorization.k8s.io/aggregate-to-edit: 'true'
+          rbac.authorization.k8s.io/aggregate-to-view: 'true'
+      rules:
+        - apiGroups:
+            - ''
+          resources:
+            - pods
+            - services
+          verbs:
+            - get
+            - watch
+            - list
+        - apiGroups:
+            - discovery.k8s.io
+          resources:
+            - endpointslices
+          verbs:
+            - get
+            - watch
+            - list
+        - apiGroups:
+            - monitoring.coreos.com
+          resources:
+            - servicemonitors
+            - podmonitors
+          verbs:
+            - get
+            - watch
+            - list
+
+- name: Deploy ClusterRoleBinding for OpenTelemetry Collector Target Allocator
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: opentelemetry-collector-targetallocator
+        labels:
+          app.kubernetes.io/name: opentelemetry-collector
+          app.kubernetes.io/component: targetallocator
+          app.kubernetes.io/managed-by: ansible
+      subjects:
+        - kind: ServiceAccount
+          name: collector-targetallocator
+          namespace: prometheus
+      roleRef:
+        kind: ClusterRole
+        name: opentelemetry-collector-targetallocator
+        apiGroup: rbac.authorization.k8s.io
+
+# OpenTelemetry Operator does not create a ServiceAccount with enough privileges.
+# See https://github.com/open-telemetry/opentelemetry-operator/issues/1679
+- name: Deploy ServiceAccount for OpenTelemetry Collector Target Allocator
+  become: true
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: prometheus
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: collector-targetallocator
+        namespace: prometheus
+        labels:
+          app.kubernetes.io/name: opentelemetry-collector
+          app.kubernetes.io/component: targetallocator
+          app.kubernetes.io/managed-by: ansible
+
 - name: Deploy OpenTelemetry Collector
   become: true
+  tags:
+    - molecule-idempotence-notest
   kubernetes.core.k8s:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     namespace: prometheus
@@ -153,6 +248,20 @@
           app.kubernetes.io/component: collector
           app.kubernetes.io/managed-by: ansible
       spec:
+        mode: statefulset
+        targetAllocator:
+          enabled: true
+          serviceAccount: collector-targetallocator
+          prometheusCR:
+            enabled: true
+            serviceMonitorSelector: '{{ observability_service_monitor_selector }}'
+            podMonitorSelector: '{{ observability_pod_monitor_selector }}'
+        # The port for prometheus exporter is not exposed automatically.
+        # See https://github.com/open-telemetry/opentelemetry-operator/issues/1689
+        ports:
+          - name: promexporter
+            port: 9000
+            protocol: TCP
         config: |
           receivers:
             otlp:
@@ -167,6 +276,12 @@
                 thrift_http:
             fluentforward:
               endpoint: 0.0.0.0:8006
+            prometheus:
+              config: {}
+              target_allocator:
+                endpoint: http://collector-targetallocator:80
+                interval: 30s
+                collector_id: $POD_NAME
 
           processors:
             attributes:
@@ -182,6 +297,8 @@
                 insecure: true
             loki:
               endpoint: http://loki:3100/loki/api/v1/push
+            prometheus:
+              endpoint: 0.0.0.0:9000
 
           service:
             pipelines:
@@ -193,6 +310,10 @@
                 receivers: [otlp, fluentforward]
                 processors: [attributes]
                 exporters: [loki]
+              metrics:
+                receivers: [otlp, prometheus]
+                processors: []
+                exporters: [prometheus]
 
 - name: Deploy OpenTelemetry Collector internal metrics PodMonitor
   become: true
