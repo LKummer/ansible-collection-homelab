@@ -29,6 +29,16 @@
             value: const
           - name: JAEGER_SAMPLER_PARAM
             value: '1'
+      monitoring:
+        # Disable self monitoring and Grafana Agent because Loki's logs are already
+        # being collected by FluentBit.
+        selfMonitoring:
+          enabled: false
+          grafanaAgent:
+            installOperator: false
+      # Chart test requires self monitoring which is disabled.
+      test:
+        enabled: false
 
 - name: Deploy Prometheus Operator Helm chart
   become: true
