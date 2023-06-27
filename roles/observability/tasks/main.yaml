@@ -297,8 +297,11 @@
             attributes:
               actions:
                 - action: insert
+                  key: loki.format
+                  value: raw
+                - action: insert
                   key: loki.attribute.labels
-                  value: stream, host, namespace, pod, container, component, application, instance
+                  value: stream, host, namespace, pod, container, component, app, instance
 
           exporters:
             otlp:
@@ -455,21 +458,14 @@
               addPrefix: labels_kubernetes_
           - modify:
               rules:
-                - remove: kubernetes_pod_id
-                - remove: kubernetes_container_hash
-                - remove: kubernetes_docker_id
-                - rename:
-                    kubernetes_container_name: kubernetes_container
-                    kubernetes_namespace_name: kubernetes_namespace
-                    kubernetes_pod_name: kubernetes_pod
                 - copy:
-                    kubernetes_pod: pod
-                    kubernetes_container: container
-                    kubernetes_namespace: namespace
+                    kubernetes_pod_name: pod
+                    kubernetes_container_name: container
+                    kubernetes_namespace_name: namespace
                     kubernetes_host: host
                     labels_kubernetes_app.kubernetes.io/component: component
                     labels_kubernetes_app.kubernetes.io/instance: instance
-                    labels_kubernetes_app.kubernetes.io/name: application
+                    labels_kubernetes_app.kubernetes.io/name: app
           - nest:
               operation: nest
               wildcard:
