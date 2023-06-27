@@ -298,7 +298,7 @@
               actions:
                 - action: insert
                   key: loki.attribute.labels
-                  value: host, namespace, pod, container, component, application, instance
+                  value: stream, host, namespace, pod, container, component, application, instance
 
           exporters:
             otlp:
@@ -416,7 +416,7 @@
         tail:
           tag: kube.*
           path: /var/log/containers/*.log
-          parser: cri
+          multilineParser: cri
           refreshIntervalSeconds: 10
           memBufLimit: 5MB
           skipLongLines: true
