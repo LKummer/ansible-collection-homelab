@@ -361,9 +361,7 @@
     - molecule-idempotence-notest
   kubernetes.core.helm:
     name: fluent-operator
-    chart_ref: fluent-operator
-    chart_repo_url: https://fluent.github.io/helm-charts
-    chart_version: '{{ observability_fluent_operator_chart_version }}'
+    chart_ref: 'https://github.com/fluent/fluent-operator/releases/download/v{{ observability_fluent_operator_chart_version }}/fluent-operator.tgz'
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     values:
@@ -497,15 +495,6 @@
           app.kubernetes.io/managed-by: ansible
       spec:
         matchRegex: (?:kube|service)\.(.*)
-        # Using Fluent forward until Fluent Operator merge a PR fixing their
-        # OpenTelemetry output config options.
-        # See https://github.com/fluent/fluent-operator/pull/708
-        # opentelemetry:
-        #   host: collector-collector
-        #   port: 4318
-        #   metricsUri: /v1/metrics
-        #   logsUri: /v1/logs
-        #   tracesUri: /v1/traces
         forward:
           host: collector-collector
           port: 8006
