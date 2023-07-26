@@ -287,7 +287,8 @@
             fluentforward:
               endpoint: 0.0.0.0:8006
             prometheus:
-              config: {}
+              config:
+                scrape_configs: []
               target_allocator:
                 endpoint: http://collector-targetallocator:80
                 interval: 30s
