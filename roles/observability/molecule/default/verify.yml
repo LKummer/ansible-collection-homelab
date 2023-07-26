@@ -29,7 +29,8 @@
     - name: Verify Grafana has Prometheus and Loki data sources
       ansible.builtin.assert:
         that:
-          - (grafana_datasources.json | length) == 3
+          # Length is 4 because it includes Loki, Prometheus, Tempo and Alert Manager.
+          - (grafana_datasources.json | length) == 4
           - '"Loki" in (grafana_datasources.json | map(attribute="typeName"))'
           - '"Prometheus" in (grafana_datasources.json | map(attribute="typeName"))'
           - '"Tempo" in (grafana_datasources.json | map(attribute="typeName"))'
@@ -45,7 +46,7 @@
           queries:
             - refId: A
               datasource:
-                uid: '{{ grafana_datasources.json[0].uid }}'
+                uid: '{{ grafana_datasources.json[1].uid }}'
               expr: '{exporter="OTLP"}'
               maxLines: 100
               intervalMs: 2000
@@ -71,7 +72,7 @@
           queries:
             - refId: A
               datasource:
-                uid: '{{ grafana_datasources.json[1].uid }}'
+                uid: '{{ grafana_datasources.json[2].uid }}'
               expr: '{scrape_job="opentelemetry-collector"}'
               maxDataPoints: 100
               intervalMs: 2000
