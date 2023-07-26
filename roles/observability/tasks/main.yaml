@@ -362,7 +362,9 @@
     - molecule-idempotence-notest
   kubernetes.core.helm:
     name: fluent-operator
-    chart_ref: 'https://github.com/fluent/fluent-operator/releases/download/v{{ observability_fluent_operator_chart_version }}/fluent-operator.tgz'
+    chart_ref: >-
+      {{ 'https://github.com/fluent/fluent-operator/releases/download/v%s/fluent-operator.tgz'
+      | format(observability_fluent_operator_chart_version) }}
     release_namespace: prometheus
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     values:
