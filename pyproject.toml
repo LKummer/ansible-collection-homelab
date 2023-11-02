@@ -7,6 +7,7 @@ authors = []
 [tool.poetry.dependencies]
 python = "^3.10"
 ansible-core = "^2.14.1"
+ansible-argspec-lint = {version = "^1.0.0", source = "gitlab-aal"}
 
 [tool.poetry.dev-dependencies]
 yamllint = "^1.27.1"
@@ -14,6 +15,17 @@ ansible-lint = "^6.5.1"
 
 [tool.poetry.group.dev.dependencies]
 molecule = "^4.0.4"
+
+
+[[tool.poetry.source]]
+name = "gitlab-aal"
+url = "https://git.houseofkummer.com/api/v4/projects/102/packages/pypi/simple"
+priority = "primary"
+
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

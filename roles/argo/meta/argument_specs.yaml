@@ -9,13 +9,8 @@ argument_specs:
         description: Hostname used for Ingress.
       argo_chart_version:
         type: str
-        default: 5.16.2
+        default: 5.41.2
         description: ArgoCD version to use.
-      argo_monitoring_enabled:
-        type: bool
-        default: true
-        description: >
-          Configure Prometheus Operator custom resources for monitoring.
       argo_cert_manager_enabled:
         type: bool
         default: true
