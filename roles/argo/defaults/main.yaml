@@ -1,4 +1,5 @@
 ---
+#!! echo argo_chart_version: $(wget -qO- https://raw.githubusercontent.com/argoproj/argo-helm/main/charts/argo-cd/Chart.yaml | yq '.version')
 argo_chart_version: 5.41.2
 argo_cert_manager_enabled: true
 argo_cert_manager_issuer_kind: ClusterIssuer

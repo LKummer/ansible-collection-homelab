@@ -1,4 +1,7 @@
 ---
+#!! echo helm_version: $(wget -qO- https://api.github.com/repos/helm/helm/releases/latest | jq -r '.tag_name')
 helm_version: v3.9.0
+#!! echo helm_diff_plugin_version: $(wget -qO- https://api.github.com/repos/databus23/helm-diff/releases/latest | jq -r '.tag_name')
 helm_diff_plugin_version: v3.5.0
+#!! echo helm_kubernetes_python_version: $(wget -qO- https://pypi.org/pypi/kubernetes/json | jq -r '.info.version')
 helm_kubernetes_python_version: 24.2.0

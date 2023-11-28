@@ -1,4 +1,5 @@
 ---
+#!! echo cert_manager_chart_version: $(wget -qO- https://api.github.com/repos/cert-manager/cert-manager/releases/latest | jq -r '.tag_name')
 cert_manager_chart_version: v1.12.3
 cert_manager_clusterissuer_enabled: true
 cert_manager_clusterissuer_name: letsencrypt
