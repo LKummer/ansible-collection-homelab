@@ -229,6 +229,8 @@
 # See https://github.com/open-telemetry/opentelemetry-operator/issues/1679
 - name: Deploy ServiceAccount for OpenTelemetry Collector Target Allocator
   become: true
+  tags:
+    - molecule-idempotence-notest
   kubernetes.core.k8s:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     namespace: prometheus
