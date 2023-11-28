@@ -20,6 +20,8 @@
           replication_factor: 1
         storage:
           type: filesystem
+        tracing:
+          enabled: true
       singleBinary:
         replicas: 1
         extraEnv:
