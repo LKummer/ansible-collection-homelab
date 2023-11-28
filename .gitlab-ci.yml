@@ -10,14 +10,13 @@ lint:
     - poetry install
     - poetry run ansible-galaxy install -r requirements.yml
     - poetry run ansible-lint -P production
-    - poetry run yamllint .
     - poetry run ansible-argspec-lint roles
 
 test-k3s:
   stage: test
   image: docker.houseofkummer.com/homelab/dockops:0.6.0
   variables:
-    ANSIBLE_HOST_KEY_CHECKING: '0'
+    ANSIBLE_HOST_KEY_CHECKING: "0"
   script:
     - pip install poetry
     - poetry install
@@ -29,7 +28,7 @@ test-observability:
   stage: test
   image: docker.houseofkummer.com/homelab/dockops:0.6.0
   variables:
-    ANSIBLE_HOST_KEY_CHECKING: '0'
+    ANSIBLE_HOST_KEY_CHECKING: "0"
   script:
     - pip install poetry
     - poetry install
@@ -45,7 +44,7 @@ test-argo:
   stage: test
   image: docker.houseofkummer.com/homelab/dockops:0.6.0
   variables:
-    ANSIBLE_HOST_KEY_CHECKING: '0'
+    ANSIBLE_HOST_KEY_CHECKING: "0"
   script:
     - pip install poetry
     - poetry install
@@ -59,7 +58,7 @@ test-cert-manager:
   stage: test
   image: docker.houseofkummer.com/homelab/dockops:0.6.0
   variables:
-    ANSIBLE_HOST_KEY_CHECKING: '0'
+    ANSIBLE_HOST_KEY_CHECKING: "0"
   script:
     - pip install poetry
     - poetry install

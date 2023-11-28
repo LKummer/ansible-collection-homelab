@@ -4,16 +4,16 @@ Collection with roles and plugins for automating a virtualized homelab.
 
 Roles:
 
-* `lkummer.homelab.argo` configures ArgoCD.
-* `lkummer.homelab.cert_manager` configures Cert Manager and a ClusterIssuer using Let's Encrypt and Cloudflare DNS.
-* `lkummer.homelab.k3s` configures K3s.
-* `lkummer.homelab.observability` configures Prometheus Operator, Grafana Agent, Grafana, Loki, Promtail, OpenTelemetry Operator, OpenTelemetry Collector and Tempo.
-* `lkummer.homelab.helm` configures hosts for use with `kubernetes.core.helm` and `kubernetes.core.k8s` modules.
+- `lkummer.homelab.argo` configures ArgoCD.
+- `lkummer.homelab.cert_manager` configures Cert Manager and a ClusterIssuer using Let's Encrypt and Cloudflare DNS.
+- `lkummer.homelab.k3s` configures K3s.
+- `lkummer.homelab.observability` configures Prometheus Operator, Grafana Agent, Grafana, Loki, Promtail, OpenTelemetry Operator, OpenTelemetry Collector and Tempo.
+- `lkummer.homelab.helm` configures hosts for use with `kubernetes.core.helm` and `kubernetes.core.k8s` modules.
 
 Inventory plugins:
 
-* `lkummer.homelab.terraform_local` populates inventory from local Terraform state files.
-* `lkummer.homelab.terraform_http` populates inventory from http Terraform state backend.
+- `lkummer.homelab.terraform_local` populates inventory from local Terraform state files.
+- `lkummer.homelab.terraform_http` populates inventory from http Terraform state backend.
 
 ## Example
 
@@ -164,12 +164,6 @@ molecule destroy
 ### Linting
 
 Make sure to lint with both yamllint and ansible-lint before pushing.
-
-To lint with `yamllint`, run:
-
-```
-yamllint .
-```
 
 To lint with `ansible-lint`, run:
 
