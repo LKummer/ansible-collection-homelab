@@ -14,10 +14,6 @@
         cert_manager_cloudflare_token: UNUSED
         cert_manager_cloudflare_zone: UNUSED
 
-    - name: Wait for pods to start up
-      ansible.builtin.wait_for:
-        timeout: 30
-
     - name: SelfSigned Issuer is present
       become: true
       kubernetes.core.k8s:

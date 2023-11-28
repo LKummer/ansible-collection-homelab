@@ -3,18 +3,15 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: Get all Kubernetes pods
+    - name: Verify all Kubernetes pods are running or succeeded
       become: true
       kubernetes.core.k8s_info:
         kubeconfig: /etc/rancher/k3s/k3s.yaml
         kind: Pod
       register: pod_list
-
-    - name: All pods are running or completed
-      ansible.builtin.assert:
-        that: item.status.phase == "Running" or item.status.phase == "Succeeded"
-        quiet: true
-      with_items: '{{ pod_list.resources }}'
+      until: pod_list.resources | map(attribute="status.phase") is subset(["Running", "Succeeded"])
+      retries: 6
+      delay: 10
 
     - name: Get pods in target namespace of Redis ArgoCD Application
       become: true
@@ -23,7 +20,6 @@
         kind: Pod
         namespace: test
       register: test_pod_list
-
-    - name: ArgoCD deployed Redis Application
-      ansible.builtin.assert:
-        that: 0 < (test_pod_list.resources | length)
+      until: 0 < (test_pod_list.resources | length)
+      retries: 3
+      delay: 10

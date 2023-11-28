@@ -3,18 +3,15 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: Get all Kubernetes pods
+    - name: Verify all Kubernetes pods are running or succeeded
       become: true
       kubernetes.core.k8s_info:
         kubeconfig: /etc/rancher/k3s/k3s.yaml
         kind: Pod
       register: pod_list
-
-    - name: All pods are running or completed
-      ansible.builtin.assert:
-        that: item.status.phase == "Running" or item.status.phase == "Succeeded"
-        quiet: true
-      with_items: '{{ pod_list.resources }}'
+      until: pod_list.resources | map(attribute="status.phase") is subset(["Running", "Succeeded"])
+      retries: 6
+      delay: 10
 
     - name: Get Grafana data sources
       ansible.builtin.uri:
@@ -35,7 +32,7 @@
           - '"Prometheus" in (grafana_datasources.json | map(attribute="typeName"))'
           - '"Tempo" in (grafana_datasources.json | map(attribute="typeName"))'
 
-    - name: Query Loki through Grafana
+    - name: Verify Loki contains logs from Promtail
       ansible.builtin.uri:
         method: POST
         url: http://127.0.0.1/api/ds/query
@@ -56,12 +53,11 @@
         headers:
           Host: grafana.example.com
       register: grafana_loki_query
+      until: 0 < (grafana_loki_query.json.results.A.frames[0].data['values'][0] | length)
+      retries: 3
+      delay: 10
 
-    - name: Verify Loki contains logs from Promtail
-      ansible.builtin.assert:
-        that: 0 < (grafana_loki_query.json.results.A.frames[0].data['values'][0] | length)
-
-    - name: Query Prometheus through Grafana
+    - name: Verify Prometheus contains metrics from OpenTelemetry Collector scrape job
       ansible.builtin.uri:
         method: POST
         url: http://127.0.0.1/api/ds/query
@@ -82,14 +78,11 @@
         headers:
           Host: grafana.example.com
       register: grafana_prometheus_query
+      until: 0 < (grafana_prometheus_query.json.results.A.frames | length)
+      retries: 3
+      delay: 10
 
-    - name: Verify Prometheus contains metrics from OpenTelemetry Collector scrape job
-      ansible.builtin.assert:
-        # Prometheus takes time to scrape metrics, checking it actually returns
-        # metrics requires more wait after converging.
-        that: 0 < (grafana_prometheus_query.json.results.A.frames | length)
-
-    - name: Query Tempo through Grafana
+    - name: Verify Tempo contains traces sent from OpenTelemetry
       ansible.builtin.uri:
         method: POST
         url: http://127.0.0.1/api/datasources/proxy/uid/{{ grafana_datasources.json[3].uid }}/api/search?q={}&limit=20&start={{ now().timestamp() | int - 3600 }}&end={{ now().timestamp() | int + 3600 }}
@@ -99,7 +92,6 @@
         headers:
           Host: grafana.example.com
       register: grafana_tempo_query
-
-    - name: Verify Tempo contains traces sent from OpenTelemetry
-      ansible.builtin.assert:
-        that: 0 < (grafana_tempo_query.json.traces | length)
+      until: 0 < (grafana_tempo_query.json.traces | length)
+      retries: 3
+      delay: 10

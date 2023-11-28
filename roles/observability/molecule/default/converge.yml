@@ -22,7 +22,3 @@
         observability_grafana_host: grafana.example.com
         observability_grafana_user: admin
         observability_grafana_password: admin
-
-    - name: Wait for pods to start up
-      ansible.builtin.wait_for:
-        timeout: 60

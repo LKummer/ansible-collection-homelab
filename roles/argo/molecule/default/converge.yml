@@ -61,7 +61,3 @@
               namespace: test
             syncPolicy:
               automated: {}
-
-    - name: Wait for pods to start up
-      ansible.builtin.wait_for:
-        timeout: 60
