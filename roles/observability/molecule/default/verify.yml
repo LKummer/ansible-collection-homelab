@@ -51,7 +51,7 @@
               maxLines: 100
               intervalMs: 2000
           from: now-1d
-          to: now
+          to: now+1d
         body_format: json
         headers:
           Host: grafana.example.com
@@ -77,7 +77,7 @@
               maxDataPoints: 100
               intervalMs: 2000
           from: now-1d
-          to: now
+          to: now+1d
         body_format: json
         headers:
           Host: grafana.example.com
@@ -87,4 +87,19 @@
       ansible.builtin.assert:
         # Prometheus takes time to scrape metrics, checking it actually returns
         # metrics requires more wait after converging.
-        that: 0 <= (grafana_prometheus_query.json.results.A.frames | length)
+        that: 0 < (grafana_prometheus_query.json.results.A.frames | length)
+
+    - name: Query Tempo through Grafana
+      ansible.builtin.uri:
+        method: POST
+        url: http://127.0.0.1/api/datasources/proxy/uid/{{ grafana_datasources.json[3].uid }}/api/search?q={}&limit=20&start={{ now().timestamp() | int - 3600 }}&end={{ now().timestamp() | int + 3600 }}
+        url_password: admin
+        url_username: admin
+        force_basic_auth: true
+        headers:
+          Host: grafana.example.com
+      register: grafana_tempo_query
+
+    - name: Verify Tempo contains traces sent from OpenTelemetry
+      ansible.builtin.assert:
+        that: 0 < (grafana_tempo_query.json.traces | length)
