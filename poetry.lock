@@ -2,13 +2,13 @@
 
 [[package]]
 name = "ansible-argspec-lint"
-version = "1.0.0"
+version = "1.0.2"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "ansible_argspec_lint-1.0.0-py3-none-any.whl", hash = "sha256:d6ef8151483cf4b7af9f0a34b0b7b74d0299f3c562a5859ab3ba91abb5efdcbd"},
-    {file = "ansible_argspec_lint-1.0.0.tar.gz", hash = "sha256:f1974c15baa1ab4b8a41e70ca1697df19d2a99ea33274f489a983ad7d70aa7ff"},
+    {file = "ansible_argspec_lint-1.0.2-py3-none-any.whl", hash = "sha256:e8c5da44d1b917f460f7ab9316ffcc8e6518f752ecd09b9579974d479e6bf7d1"},
+    {file = "ansible_argspec_lint-1.0.2.tar.gz", hash = "sha256:c0fd84a3e4c9bf753e4682c181a319837cdfd9405ad30e283fe78b91081c6b0a"},
 ]
 
 [package.dependencies]
@@ -1202,4 +1202,4 @@ reference = "gitlab-aal"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "b9d423730a2ddf8744c3b4ed925289ca1df8267b49454406ab4cf37104ecd9b1"
+content-hash = "04d0aac0d8648c5e8081eec727add4c0cf9deb35282dabf496279f8ded0f0866"

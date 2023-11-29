@@ -9,7 +9,7 @@ python = "^3.10"
 ansible-core = "^2.14.1"
 
 [tool.poetry.dev-dependencies]
-ansible-argspec-lint = {version = "^1.0.0", source = "gitlab-aal"}
+ansible-argspec-lint = {version = "^1.0.2", source = "gitlab-aal"}
 ansible-lint = "^6.5.1"
 
 [tool.poetry.group.dev.dependencies]
