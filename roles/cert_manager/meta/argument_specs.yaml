@@ -8,7 +8,7 @@ argument_specs:
     options:
       cert_manager_chart_version:
         type: str
-        default: v1.12.3
+        default: v1.13.2
         description: Version of Cert Manager to use.
       cert_manager_production_server:
         type: bool

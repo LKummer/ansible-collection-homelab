@@ -6,25 +6,25 @@ argument_specs:
     options:
       observability_kube_prometheus_stack_chart_version:
         type: str
-        default: 48.2.1
+        default: 54.2.2
         description: >
           Version of prometheus-community/kube-prometheus-stack Helm chart
           deployed.
       observability_loki_chart_version:
         type: str
-        default: 5.9.2
+        default: 5.38.0
         description: Version of grafana/loki Helm chart deployed.
       observability_tempo_chart_version:
         type: str
-        default: 1.3.1
+        default: 1.7.1
         description: Version of grafana/tempo Helm chart deployed.
       observability_opentelemetry_operator_chart_version:
         type: str
-        default: 0.34.1
+        default: 0.43.0
         description: Version of OpenTelemetry Operator Helm chart deployed.
       observability_fluent_operator_chart_version:
         type: str
-        default: 2.4.0
+        default: 2.6.0
         description: Version of Fluent Operator Helm chart deployed.
       observability_grafana_host:
         type: str

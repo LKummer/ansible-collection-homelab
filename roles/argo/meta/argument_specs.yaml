@@ -9,7 +9,7 @@ argument_specs:
         description: Hostname used for Ingress.
       argo_chart_version:
         type: str
-        default: 5.41.2
+        default: 5.51.4
         description: ArgoCD version to use.
       argo_cert_manager_enabled:
         type: bool
