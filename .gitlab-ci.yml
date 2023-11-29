@@ -2,15 +2,17 @@
 stages:
   - test
 
+default:
+  before_script:
+    - pip install -r requirements.txt
+    - ansible-galaxy install -r requirements.yml
+
 lint:
   stage: test
   image: python:3.10.6-slim-bullseye
   script:
-    - pip install poetry
-    - poetry install
-    - poetry run ansible-galaxy install -r requirements.yml
-    - poetry run ansible-lint -P production
-    - poetry run ansible-argspec-lint roles
+    - ansible-lint -P production
+    - ansible-argspec-lint roles
 
 test-k3s:
   stage: test
@@ -18,11 +20,8 @@ test-k3s:
   variables:
     ANSIBLE_HOST_KEY_CHECKING: "0"
   script:
-    - pip install poetry
-    - poetry install
-    - poetry run ansible-galaxy install -r requirements.yml
     - cd roles/k3s
-    - poetry run molecule test
+    - molecule test
 
 test-observability:
   stage: test
@@ -30,11 +29,8 @@ test-observability:
   variables:
     ANSIBLE_HOST_KEY_CHECKING: "0"
   script:
-    - pip install poetry
-    - poetry install
-    - poetry run ansible-galaxy install -r requirements.yml
     - cd roles/observability
-    - poetry run molecule test
+    - molecule test
   # Job dependencies are used to limit execution to one job at a time to conserve
   # resources, as each job creates a VM.
   needs:
@@ -46,11 +42,8 @@ test-argo:
   variables:
     ANSIBLE_HOST_KEY_CHECKING: "0"
   script:
-    - pip install poetry
-    - poetry install
-    - poetry run ansible-galaxy install -r requirements.yml
     - cd roles/argo
-    - poetry run molecule test
+    - molecule test
   needs:
     - test-observability
 
@@ -60,10 +53,7 @@ test-cert-manager:
   variables:
     ANSIBLE_HOST_KEY_CHECKING: "0"
   script:
-    - pip install poetry
-    - poetry install
-    - poetry run ansible-galaxy install -r requirements.yml
     - cd roles/cert_manager
-    - poetry run molecule test
+    - molecule test
   needs:
     - test-argo
