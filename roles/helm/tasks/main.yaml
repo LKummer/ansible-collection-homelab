@@ -23,7 +23,7 @@
 
 - name: Git is present for Helm plugin installation
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name: git
     state: present
 

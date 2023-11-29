@@ -1,7 +1,7 @@
 ---
 - name: Install GNU tar on Alpine
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name: tar
     state: present
 
