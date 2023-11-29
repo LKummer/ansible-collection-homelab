@@ -2,7 +2,7 @@
 namespace: lkummer
 name: homelab
 description: Lior's Kubernetes homelab collection
-version: 0.1.1
+version: 6.0.1
 readme: README.md
 authors:
   - Lior Kummer <lior@sneakybugs.com>

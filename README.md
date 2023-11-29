@@ -47,7 +47,7 @@ collections:
   - name: lkummer.homelab
     type: git
     source: https://github.com/LKummer/ansible-collection-homelab.git
-    version: 3.0.0
+    version: 6.0.1
 ```
 
 Install requirements from the file:
@@ -81,36 +81,23 @@ ansible-doc --type inventory lkummer.homelab.terraform_local
 
 ## Development
 
-This project uses Poetry to manage dependencies in a virtual environment.
-
-Install Poetry as it is required to download development dependencies:
-
-To install Poetry, run:
+Create a virtual environment:
 
 ```
-pip install poetry
+python3 -m venv .venv
 ```
 
-To install development dependencies, run:
+Activate the virtual environment:
 
 ```
-poetry install
+source .venv/bin/activate
 ```
 
-Commands must run inside `poetry shell` or using `poetry run` because everything required for
-development is installed in a virtual environment, including Ansible, Molecule, and the linters.
-
-To activate the virtual environment, run:
+Install dependencies:
 
 ```
-poetry shell
-```
-
-Or use `poetry run` without activating the virtual environment.
-This example runs `ansible-lint`:
-
-```
-poetry run ansible-lint -P production
+pip install -r requirements.txt
+ansible-galaxy install -r requirements.yml
 ```
 
 ### Testing
