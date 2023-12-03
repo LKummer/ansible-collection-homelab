@@ -11,7 +11,7 @@ lint:
   stage: test
   image: python:3.10.6-slim-bullseye
   script:
-    - ansible-lint -P production
+    - ansible-lint --rules-dir rules
     - ansible-argspec-lint roles
 
 test-k3s:

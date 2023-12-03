@@ -155,5 +155,5 @@ Make sure to lint with both yamllint and ansible-lint before pushing.
 To lint with `ansible-lint`, run:
 
 ```
-ansible-lint -P production
+ansible-lint --rules-dir rules
 ```
