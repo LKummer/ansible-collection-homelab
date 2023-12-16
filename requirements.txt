@@ -1,5 +1,5 @@
-ansible-core==2.16.0
+ansible-core==2.16.2
 ansible-lint==6.22.1
-molecule==6.0.2
+molecule==6.0.3
 --index-url https://git.houseofkummer.com/api/v4/projects/102/packages/pypi/simple
 ansible-argspec-lint==1.0.2

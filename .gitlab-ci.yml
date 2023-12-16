@@ -3,57 +3,51 @@ stages:
   - test
 
 default:
+  image: python:3.11.7-slim-bookworm
+  cache:
+    paths:
+      - .cache/pip
+
+.ansible:
   before_script:
+    - apt-get update
+    - apt-get install --yes git
     - pip install -r requirements.txt
     - ansible-galaxy install -r requirements.yml
 
+.terraform:
+  before_script:
+    - apt-get update
+    - apt-get install --yes wget unzip
+    - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+    - unzip /tmp/terraform.zip
+    - mv terraform /usr/local/bin
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  TF_VERSION: 1.6.5
+  ANSIBLE_HOST_KEY_CHECKING: "0"
+
 lint:
   stage: test
-  image: python:3.10.6-slim-bullseye
+  before_script:
+    - !reference [.ansible, before_script]
   script:
     - ansible-lint --rules-dir rules
     - ansible-argspec-lint roles
 
-test-k3s:
+test:
   stage: test
-  image: docker.houseofkummer.com/homelab/dockops:0.6.0
-  variables:
-    ANSIBLE_HOST_KEY_CHECKING: "0"
+  parallel:
+    matrix:
+      - ROLE:
+          - k3s
+          - observability
+          - argo
+          - cert_manager
+  before_script:
+    - !reference [.ansible, before_script]
+    - !reference [.terraform, before_script]
   script:
-    - cd roles/k3s
+    - cd roles/$ROLE
     - molecule test
-
-test-observability:
-  stage: test
-  image: docker.houseofkummer.com/homelab/dockops:0.6.0
-  variables:
-    ANSIBLE_HOST_KEY_CHECKING: "0"
-  script:
-    - cd roles/observability
-    - molecule test
-  # Job dependencies are used to limit execution to one job at a time to conserve
-  # resources, as each job creates a VM.
-  needs:
-    - test-k3s
-
-test-argo:
-  stage: test
-  image: docker.houseofkummer.com/homelab/dockops:0.6.0
-  variables:
-    ANSIBLE_HOST_KEY_CHECKING: "0"
-  script:
-    - cd roles/argo
-    - molecule test
-  needs:
-    - test-observability
-
-test-cert-manager:
-  stage: test
-  image: docker.houseofkummer.com/homelab/dockops:0.6.0
-  variables:
-    ANSIBLE_HOST_KEY_CHECKING: "0"
-  script:
-    - cd roles/cert_manager
-    - molecule test
-  needs:
-    - test-argo
